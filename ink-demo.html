@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Interactive Ink — Demo</title>
+  <meta name="description" content="Interactive liquid-ink fluid effect. Press & drag.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --mono: 'Red Hat Mono', ui-monospace, monospace;
+      --line: rgba(255, 255, 255, 0.14);
+      --dim:  rgba(255, 255, 255, 0.45);
+      --dimmer: rgba(255, 255, 255, 0.28);
+    }
+
+    html, body {
+      height: 100%;
+      background: #000;          /* pure black idle */
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;        /* full drags don't scroll/zoom the demo */
+      -webkit-font-smoothing: antialiased;
+    }
+    body { position: fixed; inset: 0; }
+
+    /* ── HINT (fades away on first interaction) ───────────────────────── */
+    .hint {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .hint span {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dim);
+      animation: breathe 3.2s ease-in-out infinite;
+    }
+    .hint.gone { opacity: 0; }
+    @keyframes breathe { 0%,100% { opacity: 0.35; } 50% { opacity: 0.85; } }
+
+    /* ── CONTROL PANEL ────────────────────────────────────────────────── */
+    .panel {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px 18px;
+      padding: 12px 16px;
+      max-width: min(720px, calc(100vw - 24px));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(8, 8, 10, 0.42);
+      backdrop-filter: blur(18px) saturate(1.1);
+      -webkit-backdrop-filter: blur(18px) saturate(1.1);
+      opacity: 0.35;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .panel:hover, .panel:focus-within { opacity: 1; }
+    .panel.hidden { opacity: 0; transform: translate(-50%, 28px); pointer-events: none; }
+
+    .seg { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 9px; }
+    .seg button {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--dim); background: transparent; border: 0; cursor: pointer;
+      padding: 6px 11px; border-radius: 7px; transition: color 0.15s, background 0.15s;
+    }
+    .seg button:hover { color: #fff; }
+    .seg button.on { color: #0a0a0a; background: rgba(255,255,255,0.86); }
+
+    .ctrl { display: flex; flex-direction: column; gap: 5px; min-width: 92px; }
+    .ctrl label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--dimmer); display: flex; justify-content: space-between; gap: 8px;
+    }
+    .ctrl label b { color: var(--dim); font-weight: 500; }
+
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 2px; border-radius: 2px;
+      background: rgba(255,255,255,0.18); cursor: pointer; outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #fff; border: 0; box-shadow: 0 0 8px rgba(255,255,255,0.45);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 11px; height: 11px; border-radius: 50%; border: 0;
+      background: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.45);
+    }
+
+    /* ── small toggles top-right ──────────────────────────────────────── */
+    .top-right {
+      position: fixed; top: 16px; right: 16px; z-index: 20;
+      display: flex; gap: 8px;
+    }
+    .top-right button {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--dim); background: rgba(8,8,10,0.42); border: 1px solid var(--line);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      padding: 7px 11px; border-radius: 9px; cursor: pointer; transition: color 0.15s, opacity 0.3s;
+    }
+    .top-right button:hover { color: #fff; }
+
+    @media (max-width: 600px) {
+      .panel { gap: 10px 14px; padding: 10px 12px; bottom: 14px; }
+      .ctrl { min-width: 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hint" id="hint"><span>Press &amp; drag to paint</span></div>
+
+  <div class="top-right">
+    <button id="clearBtn" title="Fade to black">Clear</button>
+    <button id="toggleBtn" title="Hide panel (H)">Hide UI</button>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="seg" id="palette">
+      <button data-pal="violet">Violet</button>
+      <button data-pal="mixed" class="on">Mixed</button>
+      <button data-pal="amber">Amber</button>
+    </div>
+
+    <div class="ctrl">
+      <label>Intensity <b id="vIntensity">1.0</b></label>
+      <input type="range" id="sIntensity" min="0.2" max="2" step="0.05" value="1">
+    </div>
+    <div class="ctrl">
+      <label>Radius <b id="vRadius">1.0</b></label>
+      <input type="range" id="sRadius" min="0.4" max="2.5" step="0.05" value="1">
+    </div>
+    <div class="ctrl">
+      <label>Dissipation <b id="vDissipation">1.0</b></label>
+      <input type="range" id="sDissipation" min="0.4" max="2.5" step="0.05" value="1">
+    </div>
+    <div class="ctrl">
+      <label>Curl <b id="vCurl">1.0</b></label>
+      <input type="range" id="sCurl" min="0" max="2.5" step="0.05" value="1">
+    </div>
+  </div>
+
+  <script type="module">
+    import InteractiveInkBackground from './interactive-ink.js';
+
+    const ink = new InteractiveInkBackground({
+      palette: 'mixed',
+      intensity: 1.0,
+      radius: 1.0,
+      dissipation: 1.0,
+      curl: 1.0,
+    });
+
+    /* ── hint fades on first press ───────────────────────────────────── */
+    const hint = document.getElementById('hint');
+    window.addEventListener('pointerdown', () => hint.classList.add('gone'), { once: true });
+
+    /* ── palette buttons ─────────────────────────────────────────────── */
+    const palette = document.getElementById('palette');
+    palette.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      [...palette.children].forEach((b) => b.classList.toggle('on', b === btn));
+      ink.set({ palette: btn.dataset.pal });
+    });
+
+    /* ── sliders ─────────────────────────────────────────────────────── */
+    const bind = (id, key, valId) => {
+      const s = document.getElementById(id);
+      const v = document.getElementById(valId);
+      const apply = () => { v.textContent = (+s.value).toFixed(2); ink.set({ [key]: +s.value }); };
+      s.addEventListener('input', apply);
+      apply();
+    };
+    bind('sIntensity', 'intensity', 'vIntensity');
+    bind('sRadius', 'radius', 'vRadius');
+    bind('sDissipation', 'dissipation', 'vDissipation');
+    bind('sCurl', 'curl', 'vCurl');
+
+    /* ── panel must not paint ink behind itself ──────────────────────── */
+    const panel = document.getElementById('panel');
+    const topRight = document.querySelector('.top-right');
+    [panel, topRight].forEach((el) => {
+      ['pointerdown', 'pointermove', 'pointerup'].forEach((ev) =>
+        el.addEventListener(ev, (e) => e.stopPropagation()));
+    });
+
+    /* ── hide UI / clear ─────────────────────────────────────────────── */
+    const toggleBtn = document.getElementById('toggleBtn');
+    const setHidden = (h) => {
+      panel.classList.toggle('hidden', h);
+      toggleBtn.textContent = h ? 'Show UI' : 'Hide UI';
+    };
+    toggleBtn.addEventListener('click', () => setHidden(!panel.classList.contains('hidden')));
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'h' || e.key === 'H') setHidden(!panel.classList.contains('hidden'));
+    });
+
+    // "Clear" just stops any active injection; the dye then fades to black on
+    // its own (same path as releasing the pointer).
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      ink.pointers.clear();
+    });
+  </script>
+
+</body>
+</html>

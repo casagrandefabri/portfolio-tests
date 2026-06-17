@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FABRI — Fabrizio Casagrande</title>
+  <meta name="description" content="Designing systems, products and services. Working between people and technology.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --bg:      #F5F2EC;
+      --text:    #0A0A0A;
+      --muted:   rgba(10, 10, 10, 0.38);
+      --border:  rgba(10, 10, 10, 0.08);
+      --ff:      'Helvetica Neue', Helvetica, Arial, Inter, sans-serif;
+      --ff-mono: 'Red Hat Mono', monospace;
+      --ease:    cubic-bezier(0.22, 1, 0.36, 1);
+
+      --c-simone: #F2600C;
+      --c-meta:   #6B5CE7;
+      --c-nexus:  #D63080;
+      --c-ilb:    #00B89A;
+    }
+
+    /* ─── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    a { color: inherit; text-decoration: none; }
+    img, video, svg { display: block; max-width: 100%; }
+
+    /* ─── BASE ───────────────────────────────────────────────────── */
+    html {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff);
+      font-size: 17px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body { overflow-x: hidden; }
+
+    /* ─── COLUMN (600px max = niklas.space max-w-screen-sm) ─────── */
+    .col {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── HEADER ─────────────────────────────────────────────────── */
+    .hdr {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
+    }
+    .hdr.scrolled {
+      background: rgba(245, 242, 236, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-color: var(--border);
+    }
+    .hdr-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hdr-brand {
+      font-family: var(--ff-mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+    .hdr-nav { display: flex; gap: 20px; }
+    .hdr-nav a {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+    .hdr-nav a:hover { color: var(--text); }
+
+    /* ─── TOP SPACER (niklas.space: h-56 = 224px) ───────────────── */
+    .top-spacer { height: 224px; }
+
+    /* ─── INTRO ──────────────────────────────────────────────────── */
+    .intro { padding-bottom: 48px; }
+    .intro-p {
+      font-size: 17px;
+      line-height: 1.375;
+      font-weight: 400;
+    }
+    .intro-muted { color: var(--muted); }
+
+    /* ─── PROJECT LIST ───────────────────────────────────────────── */
+    .project-list { display: flex; flex-direction: column; }
+    .project-item { position: relative; }
+
+    .project-row {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+      gap: 0;
+      user-select: none;
+    }
+    a.project-row   { cursor: pointer; }
+    div.project-row { cursor: default; }
+
+    .project-name {
+      font-size: 17px;
+      line-height: 1.375;
+      font-weight: 400;
+      color: var(--text);
+      transition: opacity 0.18s ease;
+    }
+    .project-desc {
+      font-size: 17px;
+      line-height: 1.375;
+      font-weight: 400;
+      color: var(--muted);
+      transition: opacity 0.18s ease;
+    }
+
+    /* Group hover: dim every non-active item */
+    .project-list.hovered .project-item:not(.active) .project-name,
+    .project-list.hovered .project-item:not(.active) .project-desc {
+      opacity: 0.3;
+    }
+
+    /* ─── BOTTOM SECTION ─────────────────────────────────────────── */
+    .bottom { padding-top: 80px; padding-bottom: 40px; }
+
+    .bottom-row {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+    }
+    .bottom-name {
+      font-size: 17px;
+      line-height: 1.375;
+      font-weight: 400;
+      color: var(--text);
+    }
+    .bottom-desc {
+      font-size: 17px;
+      line-height: 1.375;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .bottom-desc a {
+      border-bottom: 1px solid var(--muted);
+      padding-bottom: 1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .bottom-desc a:hover { color: var(--text); border-color: var(--text); }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    .site-footer { padding: 12px 0 40px; }
+    .footer-copy {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    /* ─── FLOATING PREVIEW CARD ──────────────────────────────────── */
+    .preview-float {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 40;
+      pointer-events: none;
+      width: 320px;
+      height: 200px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #0D0D0D;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+    }
+    .preview-float.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── PREVIEW CARD ANIMATIONS ────────────────────────────────── */
+    @keyframes scanline {
+      0%   { top: -2px; }
+      100% { top: calc(100% + 2px); }
+    }
+    @keyframes dotpulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50%       { opacity: 1;   transform: scale(1);   }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+    @keyframes bubble-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .top-spacer { height: 160px; }
+      .col { padding: 0 20px; }
+    }
+
+    @media (hover: none) {
+      .preview-float { display: none; }
+    }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ────────────────────────────────────────────────── -->
+  <header class="hdr" id="siteHeader">
+    <div class="hdr-inner">
+      <a class="hdr-brand" href="/">FABRI</a>
+      <nav class="hdr-nav">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ─── MAIN ──────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Top spacer matching niklas.space h-56 -->
+    <div class="top-spacer"></div>
+
+    <!-- INTRO -->
+    <section class="intro">
+      <div class="col">
+        <p class="intro-p">
+          Design for humans.<br>
+          <span class="intro-muted">And machines too.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section id="work">
+      <div class="col">
+        <div class="project-list" id="projectList">
+
+          <div class="project-item" data-project="simone">
+            <a class="project-row" href="simone.html">
+              <span class="project-name">SimONE</span>
+              <span class="project-desc">Making clinical education feel less like content and more like participation.</span>
+            </a>
+          </div>
+
+          <div class="project-item" data-project="meta">
+            <a class="project-row" href="metapatient.html">
+              <span class="project-name">MetaPatient</span>
+              <span class="project-desc">Designing conversations for healthcare. A new approach to AI, communication, and human behavior.</span>
+            </a>
+          </div>
+
+          <div class="project-item" data-project="nexus">
+            <a class="project-row" href="nexus.html">
+              <span class="project-name">Nexus Smart</span>
+              <span class="project-desc">Helping transportation systems move people, not just vehicles. Built for real-world operations in Colombia.</span>
+            </a>
+          </div>
+
+          <!-- No link — like niklas.space's non-clickable "Lovable" item -->
+          <div class="project-item" data-project="ilb">
+            <div class="project-row">
+              <span class="project-name">Interactive Learning Booth</span>
+              <span class="project-desc">A physical learning experience designed around interaction, attention, and shared participation. Soon.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT — same visual row rhythm, pushed down -->
+    <section class="bottom" id="about">
+      <div class="col">
+
+        <div class="bottom-row">
+          <span class="bottom-name">About</span>
+          <span class="bottom-desc">Designing systems, products and services.<br>Working between people and technology.</span>
+        </div>
+
+        <div class="bottom-row">
+          <span class="bottom-name">Worked with</span>
+          <span class="bottom-desc">Pfizer · AbbVie · AstraZeneca · Daiichi Sankyo<br>Astellas · Amgen · Merck · TransMilenio</span>
+        </div>
+
+        <div class="bottom-row">
+          <span class="bottom-name">Currently</span>
+          <span class="bottom-desc">Interactive Design Lead at Lucea.<br>Building tools for learning at scale.</span>
+        </div>
+
+        <div class="bottom-row">
+          <span class="bottom-name">Contact</span>
+          <span class="bottom-desc">
+            <a href="mailto:fabricasagrande.uy@gmail.com">fabricasagrande.uy@gmail.com</a>
+          </span>
+        </div>
+
+        <footer class="site-footer">
+          <span class="footer-copy">© 2026 Fabrizio Casagrande</span>
+        </footer>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── FLOATING PREVIEW ──────────────────────────────────────── -->
+  <div class="preview-float" id="previewFloat" aria-hidden="true"></div>
+
+  <script>
+    /* ─── HEADER: frosted glass on scroll ───────────────────────── */
+    const hdr = document.getElementById('siteHeader');
+    window.addEventListener('scroll', () => {
+      hdr.classList.toggle('scrolled', window.scrollY > 8);
+    }, { passive: true });
+
+    /* ─── FLOATING PREVIEW ───────────────────────────────────────── */
+    const float    = document.getElementById('previewFloat');
+    const projList = document.getElementById('projectList');
+
+    let mouseX = 0, mouseY = 0;
+    let curX   = 0, curY   = 0;
+    let rafId  = null;
+    let showTimer = null;
+
+    const PREVIEWS = {
+      simone: `
+        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;overflow:hidden;">
+          <div style="position:absolute;inset:0;
+               background:linear-gradient(rgba(242,96,12,0.07) 1px,transparent 1px),
+                          linear-gradient(90deg,rgba(242,96,12,0.07) 1px,transparent 1px);
+               background-size:24px 24px;"></div>
+          <div style="position:absolute;left:0;right:0;height:1px;
+               background:rgba(242,96,12,0.6);box-shadow:0 0 8px rgba(242,96,12,0.35);
+               animation:scanline 2.2s linear infinite;"></div>
+          <div style="position:absolute;top:50%;left:50%;
+               transform:translate(-50%,-52%);display:flex;gap:8px;align-items:flex-end;">
+            <div style="width:54px;height:70px;border-radius:3px;
+                 background:rgba(242,96,12,0.18);border:1px solid rgba(242,96,12,0.4);"></div>
+            <div style="width:54px;height:58px;border-radius:3px;
+                 background:rgba(242,96,12,0.1);border:1px solid rgba(242,96,12,0.2);"></div>
+            <div style="width:54px;height:44px;border-radius:3px;
+                 background:rgba(242,96,12,0.05);border:1px solid rgba(242,96,12,0.1);"></div>
+          </div>
+          <div style="position:absolute;bottom:14px;left:16px;
+               font-family:'Red Hat Mono',monospace;font-size:9px;
+               letter-spacing:0.14em;text-transform:uppercase;
+               color:rgba(242,96,12,0.65);">SimONE — Clinical Learning</div>
+        </div>`,
+
+      meta: `
+        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;
+             overflow:hidden;padding:22px 18px 18px;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="max-width:210px;background:rgba(107,92,231,0.2);
+                 border:1px solid rgba(107,92,231,0.35);
+                 border-radius:12px 12px 12px 3px;padding:7px 11px;
+                 font-family:'Red Hat Mono',monospace;font-size:9.5px;line-height:1.5;
+                 color:rgba(255,255,255,0.45);
+                 animation:bubble-in 0.3s ease 0.1s both;">
+              Good morning. How are you feeling today?
+            </div>
+            <div style="max-width:190px;align-self:flex-end;
+                 background:rgba(107,92,231,0.11);border:1px solid rgba(107,92,231,0.2);
+                 border-radius:12px 12px 3px 12px;padding:7px 11px;
+                 font-family:'Red Hat Mono',monospace;font-size:9.5px;line-height:1.5;
+                 color:rgba(255,255,255,0.3);
+                 animation:bubble-in 0.3s ease 0.38s both;">
+              A little anxious about surgery tomorrow.
+            </div>
+          </div>
+          <div style="position:absolute;bottom:17px;left:18px;
+               display:flex;gap:4px;align-items:center;">
+            <div style="width:5px;height:5px;border-radius:50%;
+                 background:rgba(107,92,231,0.8);
+                 animation:dotpulse 1.4s ease infinite;animation-delay:0s;"></div>
+            <div style="width:5px;height:5px;border-radius:50%;
+                 background:rgba(107,92,231,0.8);
+                 animation:dotpulse 1.4s ease infinite;animation-delay:0.2s;"></div>
+            <div style="width:5px;height:5px;border-radius:50%;
+                 background:rgba(107,92,231,0.8);
+                 animation:dotpulse 1.4s ease infinite;animation-delay:0.4s;"></div>
+          </div>
+          <div style="position:absolute;bottom:14px;right:16px;
+               font-family:'Red Hat Mono',monospace;font-size:9px;
+               letter-spacing:0.14em;text-transform:uppercase;
+               color:rgba(107,92,231,0.65);">MetaPatient</div>
+        </div>`,
+
+      nexus: `
+        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;
+             overflow:hidden;padding:18px 16px;">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;">
+            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
+            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
+            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
+            <div style="height:26px;border-radius:2px;background:#D63080;
+                 animation:blink 1.1s ease infinite;"></div>
+            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
+            <div style="height:26px;border-radius:2px;background:rgba(255,255,255,.1);"></div>
+            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
+            <div style="height:26px;border-radius:2px;background:#F59E0B;opacity:.85;"></div>
+          </div>
+          <div style="height:1px;background:rgba(214,48,128,.2);margin-bottom:10px;"></div>
+          <div style="font-family:'Red Hat Mono',monospace;font-size:9px;
+               color:rgba(214,48,128,.65);letter-spacing:.1em;text-transform:uppercase;">
+            1 alert · 14 stations active
+          </div>
+          <div style="position:absolute;bottom:14px;right:16px;
+               font-family:'Red Hat Mono',monospace;font-size:9px;
+               letter-spacing:.14em;text-transform:uppercase;
+               color:rgba(214,48,128,.65);">Nexus Smart</div>
+        </div>`,
+
+      ilb: `
+        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;overflow:hidden;
+             display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;">
+          <div style="width:48px;height:48px;border-radius:50%;
+               background:rgba(0,184,154,.12);border:1px solid rgba(0,184,154,.35);
+               display:flex;align-items:center;justify-content:center;">
+            <div style="width:10px;height:10px;border-radius:50%;background:#00B89A;
+                 animation:dotpulse 2s ease infinite;"></div>
+          </div>
+          <div style="font-family:'Red Hat Mono',monospace;font-size:9px;
+               letter-spacing:.2em;text-transform:uppercase;color:rgba(0,184,154,.65);">
+            Coming soon
+          </div>
+        </div>`
+    };
+
+    /* ─── CURSOR TRACKING ────────────────────────────────────────── */
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    }, { passive: true });
+
+    function startFollow(snap) {
+      if (snap) { curX = mouseX; curY = mouseY; }
+      if (rafId) return;
+
+      const tick = () => {
+        curX += (mouseX - curX) * 0.14;
+        curY += (mouseY - curY) * 0.14;
+
+        const W = 320, H = 200, OX = 24, OY = -90;
+        let x = curX + OX;
+        let y = curY + OY;
+
+        /* flip to left of cursor if near right edge */
+        if (x + W > window.innerWidth  - 16) x = curX - W - OX;
+        /* clamp vertically */
+        if (y < 16) y = 16;
+        if (y + H > window.innerHeight - 16) y = window.innerHeight - H - 16;
+
+        float.style.left = x + 'px';
+        float.style.top  = y + 'px';
+        rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function stopFollow() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    /* ─── HOVER EVENTS ───────────────────────────────────────────── */
+    projList.querySelectorAll('.project-item').forEach(item => {
+      const key = item.dataset.project;
+
+      item.addEventListener('mouseenter', () => {
+        projList.classList.add('hovered');
+        item.classList.add('active');
+
+        clearTimeout(showTimer);
+        showTimer = setTimeout(() => {
+          if (!PREVIEWS[key]) return;
+          float.innerHTML = PREVIEWS[key];
+          float.classList.add('visible');
+          startFollow(true);
+        }, 80);
+      });
+
+      item.addEventListener('mouseleave', () => {
+        projList.classList.remove('hovered');
+        item.classList.remove('active');
+        clearTimeout(showTimer);
+        float.classList.remove('visible');
+        stopFollow();
+      });
+    });
+  </script>
+
+</body>
+</html>

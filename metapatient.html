@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaPatient — Fabrizio Casagrande</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="case-base.css">
+  <style>
+    :root { --accent: #6B5CE7; }
+
+    /* ── MetaPatient hero placeholder ── */
+    .hero-meta {
+      position: absolute; inset: 0;
+      background: #06060F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      overflow: hidden;
+      gap: 40px;
+    }
+    .hero-avatar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    .hero-avatar {
+      width: clamp(80px, 12vw, 140px);
+      height: clamp(80px, 12vw, 140px);
+      border-radius: 50%;
+      background: rgba(107,92,231,0.1);
+      border: 1px solid rgba(107,92,231,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .hero-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(107,92,231,0.12);
+      animation: avatarPulse 3s ease-in-out infinite;
+    }
+    @keyframes avatarPulse {
+      0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.08);opacity:0.2}
+    }
+    .avatar-initials {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: clamp(14px, 2vw, 20px);
+      letter-spacing: 0.06em;
+      color: rgba(107,92,231,0.6);
+    }
+    .avatar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .avatar-status-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #6B5CE7;
+      animation: spulse 2s ease-in-out infinite;
+    }
+    @keyframes spulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .avatar-status-label {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(107,92,231,0.5);
+    }
+    .hero-chat-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 480px;
+    }
+    .hero-bubble {
+      padding: 10px 14px;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: clamp(8px, 1vw, 10px);
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    }
+    .bubble-patient {
+      background: rgba(107,92,231,0.1);
+      border-left: 2px solid rgba(107,92,231,0.45);
+      color: rgba(255,255,255,0.5);
+      align-self: flex-start;
+      max-width: 85%;
+    }
+    .bubble-user {
+      background: rgba(255,255,255,0.04);
+      border-right: 2px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.4);
+      align-self: flex-end;
+      max-width: 80%;
+    }
+    .bubble-typing {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      align-self: flex-start;
+    }
+    .typing-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(107,92,231,0.5);
+      animation: tdot 1.5s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2){animation-delay:.2s}
+    .typing-dot:nth-child(3){animation-delay:.4s}
+    @keyframes tdot { 0%,100%{opacity:.25;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+    .hero-meta-label {
+      position: absolute;
+      bottom: 20px; left: 28px;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(107,92,231,0.3);
+    }
+
+    /* ── Conversation system diagram ── */
+    .conv-diagram {
+      position: absolute; inset: 0;
+      background: var(--bg-card);
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .conv-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      min-height: 48px;
+    }
+    .conv-cell {
+      flex: 1;
+      border: 1px solid rgba(0,0,0,0.08);
+      margin: -0.5px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .conv-cell-label {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.4);
+      text-align: center;
+      line-height: 1.5;
+    }
+    .conv-cell.header-cell {
+      background: #0A0A0A;
+    }
+    .conv-cell.header-cell .conv-cell-label { color: rgba(255,255,255,0.5); }
+    .conv-cell.accent-cell {
+      background: rgba(107,92,231,0.08);
+      border-color: rgba(107,92,231,0.2);
+    }
+    .conv-cell.accent-cell .conv-cell-label { color: rgba(107,92,231,0.8); }
+
+    /* ── Interface placeholder ── */
+    .iface-meta {
+      position: absolute; inset: 0;
+      background: #07080F;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      overflow: hidden;
+    }
+    .meta-chat-area {
+      border-right: 1px solid rgba(255,255,255,0.05);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .meta-chat-header {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 4px;
+    }
+    .meta-bubble {
+      padding: 9px 12px;
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 8.5px;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    }
+    .mb-patient {
+      border-left: 2px solid rgba(107,92,231,0.5);
+      background: rgba(107,92,231,0.08);
+      color: rgba(255,255,255,0.45);
+      align-self: flex-start;
+      max-width: 80%;
+    }
+    .mb-user {
+      border-right: 2px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.35);
+      align-self: flex-end;
+      max-width: 75%;
+    }
+    .meta-sidebar {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .meta-sidebar-block {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 10px;
+    }
+    .msb-label {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(107,92,231,0.4);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .msb-content {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 8.5px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.02em;
+    }
+    .msb-state {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .msb-state-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: #6B5CE7; opacity: 0.7;
+    }
+    .msb-state-text {
+      font-family: 'Red Hat Mono', monospace;
+      font-size: 7.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(107,92,231,0.5);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────── -->
+<header class="site-header" id="site-header">
+  <a href="index.html" class="header-brand">fabrizio casagrande</a>
+  <nav class="header-nav">
+    <a href="index.html#work" class="active">Work</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+</header>
+
+<div class="page-spacer"></div>
+
+<!-- ─── CASE INTRO ─────────────────────────────────────────── -->
+<div class="case-intro reveal">
+  <div class="case-breadcrumb">
+    <a href="index.html">Fabrizio Casagrande</a>
+    <span class="case-breadcrumb-sep">/</span>
+    <a href="index.html#work">Work</a>
+    <span class="case-breadcrumb-sep">/</span>
+    <span>MetaPatient</span>
+  </div>
+  <h1 class="case-headline">
+    Technology shouldn't replace conversations. It should help us have better ones.
+  </h1>
+  <div class="case-meta-row">
+    <div class="case-meta-item">
+      <span class="case-meta-label">Role</span>
+      <span class="case-meta-value">Interactive Design Lead</span>
+    </div>
+    <div class="case-meta-item">
+      <span class="case-meta-label">Year</span>
+      <span class="case-meta-value">2024</span>
+    </div>
+    <div class="case-meta-item">
+      <span class="case-meta-label">Client</span>
+      <span class="case-meta-value">Healthcare · Pharmaceutical</span>
+    </div>
+    <div class="case-meta-item">
+      <span class="case-meta-label">Type</span>
+      <span class="case-meta-value">AI Avatars · Simulation · Conversational UX</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── HERO MEDIA ─────────────────────────────────────────── -->
+<div class="case-hero reveal">
+  <div class="hero-meta">
+    <div class="hero-avatar-col">
+      <div class="hero-avatar">
+        <span class="avatar-initials">MP</span>
+      </div>
+      <div class="avatar-status">
+        <div class="avatar-status-dot"></div>
+        <span class="avatar-status-label">Patient active</span>
+      </div>
+    </div>
+    <div class="hero-chat-col">
+      <div class="hero-bubble bubble-patient">
+        Good morning. I've been experiencing a persistent pressure behind my eyes for three days now. It gets worse in the morning.
+      </div>
+      <div class="hero-bubble bubble-user">
+        Can you describe the intensity on a scale of one to ten? Does it affect your vision at any point?
+      </div>
+      <div class="hero-bubble bubble-patient">
+        I'd say six or seven. And yes — sometimes my vision blurs slightly, especially when I stand up quickly.
+      </div>
+      <div class="bubble-typing">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    <div class="hero-meta-label">MetaPatient — AI Patient Simulation</div>
+  </div>
+</div>
+
+<!-- ─── OPENING ────────────────────────────────────────────── -->
+<div class="case-body">
+  <div class="col-narrow">
+    <div class="case-section reveal">
+      <p class="case-lede">
+        Communication is one of the most important skills in healthcare. It's also one of the hardest to practice.
+      </p>
+      <p class="case-p">
+        Most professionals learn by observing. Reading. Listening.
+      </p>
+      <p class="case-p">
+        Very few get the opportunity to repeatedly practice difficult conversations in realistic environments. The conditions that make those conversations hard — uncertainty, emotional weight, incomplete information — are precisely the conditions that can't be simulated in a classroom.
+      </p>
+      <p class="case-p">
+        And yet those conversations happen every day. Between a physician and a patient with a new diagnosis. Between a consultant and a family making a difficult decision. Between a nurse and someone in pain who doesn't understand what's happening to them.
+      </p>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="case-label">Observation</span>
+      <p class="case-p">
+        The goal wasn't creating another chatbot.
+      </p>
+      <p class="case-p">
+        The goal wasn't creating a realistic avatar.
+      </p>
+      <p class="case-p">
+        The goal was creating a space to practice.
+      </p>
+      <p class="case-p">
+        That distinction mattered. Chatbots optimise for completion. Avatars optimise for realism. Neither is necessarily designed for learning. For MetaPatient, the central design question was: what does an interaction need to feel like in order for practice to actually happen?
+      </p>
+    </div>
+
+    <div class="case-section reveal">
+      <span class="case-label">Tension</span>
+      <blockquote class="case-blockquote">
+        How do you create an interaction that feels safe enough to explore, but realistic enough to matter?
+      </blockquote>
+      <p class="case-p">
+        A patient that could respond. A conversation that could evolve. A system that could adapt.
+      </p>
+      <p class="case-p">
+        The tension was real. Too much realism creates anxiety that shuts down exploration. Too little realism removes the stakes that make practice meaningful. The design had to find a precise middle ground — and hold it across a highly variable set of clinical scenarios and user profiles.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONVERSATION SYSTEM DIAGRAM ───────────────────────── -->
+<div class="case-media case-media-4x3 reveal" style="max-width:1000px;margin-left:auto;margin-right:auto;background:var(--bg-card);">
+  <div class="conv-diagram">
+    <div class="conv-row">
+      <div class="conv-cell header-cell"><span class="conv-cell-label">User Input</span></div>
+      <div class="conv-cell header-cell"><span class="conv-cell-label">Patient State</span></div>
+      <div class="conv-cell header-cell"><span class="conv-cell-label">AI Response</span></div>
+      <div class="conv-cell header-cell"><span class="conv-cell-label">Feedback Loop</span></div>
+    </div>
+    <div class="conv-row">
+      <div class="conv-cell"><span class="conv-cell-label">Open question</span></div>
+      <div class="conv-cell accent-cell"><span class="conv-cell-label">Receptive · Calm</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Full disclosure</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Detailed record</span></div>
+    </div>
+    <div class="conv-row">
+      <div class="conv-cell"><span class="conv-cell-label">Closed question</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Neutral · Observing</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Brief answer</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Flagged in log</span></div>
+    </div>
+    <div class="conv-row">
+      <div class="conv-cell"><span class="conv-cell-label">Empathic cue</span></div>
+      <div class="conv-cell accent-cell"><span class="conv-cell-label">Reassured · Open</span></div>
+      <div class="conv-cell accent-cell"><span class="conv-cell-label">Elaborates freely</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Positive signal</span></div>
+    </div>
+    <div class="conv-row">
+      <div class="conv-cell"><span class="conv-cell-label">Medical jargon</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Confused · Withdrawn</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Short · Uncertain</span></div>
+      <div class="conv-cell"><span class="conv-cell-label">Communication gap</span></div>
+    </div>
+  </div>
+</div>
+<p class="case-media-caption reveal">Conversation state matrix — patient response adapts to interaction type</p>
+
+<!-- ─── SYSTEM DESIGNED ────────────────────────────────────── -->
+<div class="case-body">
+  <div class="col-narrow">
+    <div class="case-section reveal">
+      <span class="case-label">System designed</span>
+      <p class="case-lede">
+        MetaPatient combines simulation design, conversational AI, and storytelling to create dynamic patient interactions.
+      </p>
+      <p class="case-p">
+        Not to automate communication. To support it.
+      </p>
+      <p class="case-p">
+        The system presents a patient with a defined clinical profile, emotional state, and communication style. The user interacts through natural language. The AI interprets intent — not just content — and responds in ways that reflect how a real patient would behave given that kind of interaction.
+      </p>
+      <p class="case-p">
+        Every session is recorded, reviewed, and structured into teachable moments. The feedback isn't "right or wrong" — it's a mirror. What did the patient reveal? What remained unsaid? Where did the conversation open up, and where did it close?
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── INTERFACE MEDIA ────────────────────────────────────── -->
+<div class="case-media case-media-16x9 reveal">
+  <div class="iface-meta">
+    <div class="meta-chat-area">
+      <div class="meta-chat-header">MetaPatient — Simulation Session · Scenario 03</div>
+      <div class="meta-bubble mb-patient">
+        Doctor, I've been feeling very fatigued for the past few weeks. I thought it would pass but it hasn't.
+      </div>
+      <div class="meta-bubble mb-user">
+        I understand. Can you tell me more about when the fatigue started — was there anything specific happening in your life around that time?
+      </div>
+      <div class="meta-bubble mb-patient">
+        Actually... yes. My mother passed away about two months ago. I thought maybe it was grief. But even after the initial period, I still feel this way.
+      </div>
+      <div class="meta-bubble mb-user">
+        Thank you for sharing that. I'm sorry for your loss. I'd like to explore both possibilities — have you noticed any changes in your sleep, appetite, or energy throughout the day?
+      </div>
+      <div class="bubble-typing" style="display:flex;gap:4px;padding:10px 14px;">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    <div class="meta-sidebar">
+      <div class="meta-sidebar-block">
+        <span class="msb-label">Patient profile</span>
+        <div class="msb-content">Female, 54<br>GP referral<br>No prior diagnoses</div>
+      </div>
+      <div class="meta-sidebar-block">
+        <span class="msb-label">Emotional state</span>
+        <div class="msb-state">
+          <div class="msb-state-dot"></div>
+          <span class="msb-state-text">Receptive · Cautious</span>
+        </div>
+      </div>
+      <div class="meta-sidebar-block">
+        <span class="msb-label">Communication quality</span>
+        <div class="msb-content">
+          Empathic cues detected.<br>
+          Open questions: 3<br>
+          Patient disclosure: high
+        </div>
+      </div>
+      <div class="meta-sidebar-block">
+        <span class="msb-label">Session notes</span>
+        <div class="msb-content" style="opacity:0.5">Bereavement context surfaced. Possible differential: depression vs hypothyroidism.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="case-media-caption reveal">Simulation interface — live session with patient context, emotional state, and communication quality tracking</p>
+
+<!-- ─── WHAT CHANGED ───────────────────────────────────────── -->
+<div class="case-body">
+  <div class="col-narrow">
+    <div class="case-section reveal">
+      <span class="case-label">What changed</span>
+      <p class="case-p">
+        The most interesting challenge wasn't technical.
+      </p>
+      <p class="case-p">
+        It was behavioural.
+      </p>
+      <p class="case-p">
+        When users first engage with MetaPatient, they tend to treat it as a system to complete — answering questions efficiently, collecting information quickly, moving toward a clinical conclusion. The interaction feels like a form.
+      </p>
+      <p class="case-p">
+        As sessions progress, something shifts. The patient responds differently to different kinds of questions. The user begins to notice. They slow down. They try again with different phrasing. They start listening to what the patient reveals rather than extracting what they need.
+      </p>
+      <blockquote class="case-blockquote">
+        The system didn't teach communication. It created the conditions for users to discover why it mattered.
+      </blockquote>
+      <p class="case-p">
+        That transition — from extracting to listening — is what the system was built to enable. Not through instruction, but through design.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── NEXT PROJECT ───────────────────────────────────────── -->
+<div class="case-next reveal">
+  <div>
+    <span class="case-next-label">Previous project</span>
+    <a href="simone.html" class="case-next-link" style="display:block;opacity:0.4;font-size:clamp(14px,1.5vw,18px);font-weight:600;letter-spacing:-0.01em;transition:opacity .15s;">
+      ← SimONE
+    </a>
+  </div>
+  <div style="text-align:right;">
+    <span class="case-next-label">Next project</span>
+    <a href="nexus.html" class="case-next-link" style="display:block;">
+      <div class="case-next-title">Nexus Smart</div>
+    </a>
+  </div>
+  <a href="nexus.html" class="case-next-link" aria-hidden="true">
+    <div class="case-next-arrow">→</div>
+  </a>
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────────────── -->
+<footer class="case-footer">
+  <span class="case-footer-copy">© 2026 Fabrizio Casagrande</span>
+  <span class="case-footer-copy">Interactive Design Lead</span>
+</footer>
+
+<script>
+(function() {
+  const hdr = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    hdr.classList.toggle('scrolled', window.scrollY > 48);
+  }, { passive: true });
+  const els = document.querySelectorAll('.reveal');
+  const io  = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>
