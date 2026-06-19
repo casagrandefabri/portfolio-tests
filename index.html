@@ -2,521 +2,526 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FABRI — Fabrizio Casagrande</title>
-  <meta name="description" content="Designing systems, products and services. Working between people and technology.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CASAGRANDE</title>
+  <meta name="description" content="Designing products, services and experiences for humans.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
-    /* ─── TOKENS ─────────────────────────────────────────────────── */
-    :root {
-      --bg:      #F5F2EC;
-      --text:    #0A0A0A;
-      --muted:   rgba(10, 10, 10, 0.38);
-      --border:  rgba(10, 10, 10, 0.08);
-      --ff:      'Helvetica Neue', Helvetica, Arial, Inter, sans-serif;
-      --ff-mono: 'Red Hat Mono', monospace;
-      --ease:    cubic-bezier(0.22, 1, 0.36, 1);
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-      --c-simone: #F2600C;
-      --c-meta:   #6B5CE7;
-      --c-nexus:  #D63080;
-      --c-ilb:    #00B89A;
+    :root {
+      --mono: 'Red Hat Mono', ui-monospace, monospace;
+      --border: rgba(255,255,255,0.09);
+      --dim: rgba(255,255,255,0.38);
+      --dimmer: rgba(255,255,255,0.22);
+      --surface: rgba(5,5,7,0.60);
     }
 
-    /* ─── RESET ──────────────────────────────────────────────────── */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    a { color: inherit; text-decoration: none; }
-    img, video, svg { display: block; max-width: 100%; }
-
-    /* ─── BASE ───────────────────────────────────────────────────── */
-    html {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--ff);
-      font-size: 17px;
-      line-height: 1.5;
+    html, body {
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      isolation: isolate;
     }
-    body { overflow-x: hidden; }
-
-    /* ─── COLUMN (600px max = niklas.space max-w-screen-sm) ─────── */
-    .col {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* ─── HEADER ─────────────────────────────────────────────────── */
-    .hdr {
+    body {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 50;
-      border-bottom: 1px solid transparent;
-      transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
-    }
-    .hdr.scrolled {
-      background: rgba(245, 242, 236, 0.85);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-color: var(--border);
-    }
-    .hdr-inner {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 56px;
+      inset: 0;
       display: flex;
+      flex-direction: row;
+      justify-content: center;
       align-items: center;
-      justify-content: space-between;
-    }
-    .hdr-brand {
-      font-family: var(--ff-mono);
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-    }
-    .hdr-nav { display: flex; gap: 20px; }
-    .hdr-nav a {
-      font-family: var(--ff-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      transition: color 0.15s;
-    }
-    .hdr-nav a:hover { color: var(--text); }
-
-    /* ─── TOP SPACER (niklas.space: h-56 = 224px) ───────────────── */
-    .top-spacer { height: 224px; }
-
-    /* ─── INTRO ──────────────────────────────────────────────────── */
-    .intro { padding-bottom: 48px; }
-    .intro-p {
-      font-size: 17px;
-      line-height: 1.375;
-      font-weight: 400;
-    }
-    .intro-muted { color: var(--muted); }
-
-    /* ─── PROJECT LIST ───────────────────────────────────────────── */
-    .project-list { display: flex; flex-direction: column; }
-    .project-item { position: relative; }
-
-    .project-row {
-      display: flex;
-      flex-direction: column;
-      padding: 12px 0;
-      gap: 0;
-      user-select: none;
-    }
-    a.project-row   { cursor: pointer; }
-    div.project-row { cursor: default; }
-
-    .project-name {
-      font-size: 17px;
-      line-height: 1.375;
-      font-weight: 400;
-      color: var(--text);
-      transition: opacity 0.18s ease;
-    }
-    .project-desc {
-      font-size: 17px;
-      line-height: 1.375;
-      font-weight: 400;
-      color: var(--muted);
-      transition: opacity 0.18s ease;
     }
 
-    /* Group hover: dim every non-active item */
-    .project-list.hovered .project-item:not(.active) .project-name,
-    .project-list.hovered .project-item:not(.active) .project-desc {
-      opacity: 0.3;
-    }
-
-    /* ─── BOTTOM SECTION ─────────────────────────────────────────── */
-    .bottom { padding-top: 80px; padding-bottom: 40px; }
-
-    .bottom-row {
-      display: flex;
-      flex-direction: column;
-      padding: 12px 0;
-    }
-    .bottom-name {
-      font-size: 17px;
-      line-height: 1.375;
-      font-weight: 400;
-      color: var(--text);
-    }
-    .bottom-desc {
-      font-size: 17px;
-      line-height: 1.375;
-      font-weight: 400;
-      color: var(--muted);
-    }
-    .bottom-desc a {
-      border-bottom: 1px solid var(--muted);
-      padding-bottom: 1px;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .bottom-desc a:hover { color: var(--text); border-color: var(--text); }
-
-    /* ─── FOOTER ─────────────────────────────────────────────────── */
-    .site-footer { padding: 12px 0 40px; }
-    .footer-copy {
-      font-family: var(--ff-mono);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-    }
-
-    /* ─── FLOATING PREVIEW CARD ──────────────────────────────────── */
-    .preview-float {
+    /* ─── CUSTOM CURSOR ──────────────────────────────────────────────── */
+    #cursor {
       position: fixed;
       top: 0; left: 0;
-      z-index: 40;
       pointer-events: none;
-      width: 320px;
-      height: 200px;
-      border-radius: 4px;
-      overflow: hidden;
-      background: #0D0D0D;
+      z-index: 9000;
+      display: none;
+    }
+    #cursor-inner {
+      width: 30px; height: 30px;
+      transform-origin: center center;
+      transition: filter 0.12s ease;
+    }
+    #cursor-inner svg { display: block; }
+
+    /* First-time "CLICK AND DRAG" hint — sits inside #cursor so it moves
+       with the ring. Dismissed permanently after the first click-and-drag. */
+    #cursor-hint {
+      position: absolute;
+      bottom: calc(100% + 8px);     /* 8px gap above the 30px ring */
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      body { cursor: none; }
+      #cursor { display: block; }
+    }
+
+    /* ─── LOGO (static fallback; hidden when the GPU-displaced logo is live) ─ */
+    #logo-wrap {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+      /* Figma: logo vertical center sits ~13.5px above frame center */
+      transform: translateY(-13px);
+    }
+    #logo-wrap.gl-active { visibility: hidden; }   /* GL logo takes over seamlessly */
+    #logo-wrap svg {
+      width: clamp(280px, 76vw, 1302px);
+      height: auto;
+      display: block;
+      user-select: none;
+    }
+
+    /* ─── BOTTOM COPY ────────────────────────────────────────────────── */
+    #copy {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    #copy p {
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.08px;
+      text-transform: uppercase;
+      color: #fff;            /* line 1: full white */
+      line-height: normal;
+    }
+    #copy p + p {
+      margin-top: 12px;
+      color: rgba(255,255,255,0.3);   /* line 2: 30% white */
+    }
+
+    /* ─── LINKEDIN ───────────────────────────────────────────────────── */
+    #linkedin {
+      position: fixed;
+      bottom: 40px; left: 40px;
+      z-index: 20;
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      /* Figma: subtle violet→pink tint at 10% */
+      background: linear-gradient(78.9deg, rgba(209,209,255,0.1) 0%, rgba(255,192,226,0.1) 99.834%);
+      border-radius: 12px;
+      padding: 12px 18px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+      touch-action: auto;
+    }
+    #linkedin:hover {
+      background: linear-gradient(78.9deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 99.834%);
+    }
+    #linkedin svg { flex-shrink: 0; }
+    #linkedin:focus { outline: none; }
+    #linkedin:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(255,255,255,0.55); }
+
+    /* ─── TOP ICONS (decorative brand glyphs, per the Figma frame) ─────── */
+    #ink-trigger-wrap {
+      position: fixed;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+    }
+    #ink-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    /* Exact exported Figma ISO-S asset — rendered at natural proportion, vector
+       (crisp on retina by nature), never stretched. The SVG includes its own
+       Figma padding, so the trigger box matches the frame 1:1. */
+    .ink-trigger-icons {
+      display: block;
+      width: 138px;
+      height: auto;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    /* ─── SHUFFLE BUTTON — "SWAP COLORS" pill (matches latest Figma frame) ── */
+    #shuffle-btn {
+      position: fixed;
+      bottom: 40px; right: 40px;
+      z-index: 20;
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      color: #fff;
+      /* Figma: subtle violet→pink tint at 10% (same treatment as LinkedIn) */
+      background: linear-gradient(76.47deg, rgba(209,209,255,0.1) 0%, rgba(255,192,226,0.1) 99.834%);
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.3s;
+      touch-action: auto;
+    }
+    #shuffle-btn:hover {
+      background: linear-gradient(76.47deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 99.834%);
+    }
+    #shuffle-btn:focus { outline: none; }
+    #shuffle-btn:focus-visible { outline: none; box-shadow: 0 0 0 1px rgba(255,255,255,0.55); }
+    #shuffle-btn .swap-icon {
+      display: block; width: 14px; height: 16px; flex-shrink: 0; pointer-events: none;
+    }
+
+    /* ─── CURSOR-REACTIVE AURA ───────────────────────────────────────────
+       A restrained light bloom that appears only under the cursor. Per-element
+       auras use a ::before radial gradient centered at --mx/--my (updated by JS).
+       Desktop only — JS never activates it on touch, so it stays invisible. ── */
+    [data-aura] { position: relative; isolation: isolate; }
+    [data-aura]::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;                  /* above the element's own bg, below its content */
+      border-radius: inherit;
+      pointer-events: none;
       opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.18s var(--ease), transform 0.18s var(--ease);
+      transition: opacity 220ms ease;   /* fade out */
+      background: radial-gradient(circle var(--aura-size, 90px) at var(--mx, 50%) var(--my, 50%),
+                  rgba(255,255,255, var(--aura-strength, 0.16)) 0%, transparent 72%);
     }
-    .preview-float.visible {
-      opacity: 1;
-      transform: translateY(0);
+    [data-aura].is-aura-active::before { opacity: 1; transition-duration: 150ms; }  /* fade in */
+    #linkedin    { --aura-size: 85px; --aura-strength: 0.16; }
+    #shuffle-btn { --aura-size: 95px; --aura-strength: 0.16; }
+    #ink-trigger { --aura-size: 70px; --aura-strength: 0.18; }
+
+    /* Full-viewport pointer tracker — transparent event surface that sits above
+       the ink canvas (z:0) but below all UI (z:10+). pointer-events enabled so
+       it receives enter/move/leave/down/up; events still bubble to window (no
+       stopPropagation here) so ink interaction is unaffected. When the cursor
+       moves onto a UI element (higher z-index), hit-testing switches to that
+       element and the tracker fires pointerleave, naturally hiding the aura. */
+    #canvas-tracker {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
     }
 
-    /* ─── PREVIEW CARD ANIMATIONS ────────────────────────────────── */
-    @keyframes scanline {
-      0%   { top: -2px; }
-      100% { top: calc(100% + 2px); }
+    /* Global canvas affordance — follows cursor over the tracker area.
+       Uses a fully-opaque white gradient so element opacity alone controls
+       visibility (avoids double-alpha multiplication that made it invisible). */
+    #canvas-aura {
+      position: fixed; top: 0; left: 0;
+      z-index: 5;
+      pointer-events: none;
+      will-change: transform;
     }
-    @keyframes dotpulse {
-      0%, 100% { opacity: 0.3; transform: scale(0.8); }
-      50%       { opacity: 1;   transform: scale(1);   }
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.2; }
-    }
-    @keyframes bubble-in {
-      from { opacity: 0; transform: translateY(4px); }
-      to   { opacity: 1; transform: translateY(0); }
+    #canvas-aura-inner {
+      position: absolute;
+      left: -924px; top: -924px;
+      width: 1848px; height: 1848px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        rgba(255,255,255,0.078) 0%,
+        rgba(255,255,255,0.035) 14%,
+        rgba(255,255,255,0.014) 30%,
+        rgba(255,255,255,0.004) 50%,
+        rgba(255,255,255,0.001) 68%,
+        rgba(255,255,255,0)     84%
+      );
+      opacity: 0;
+      will-change: opacity, transform;
     }
 
-    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    /* ─── RESPONSIVE ─────────────────────────────────────────────────── */
     @media (max-width: 600px) {
-      .top-spacer { height: 160px; }
-      .col { padding: 0 20px; }
+      #copy { white-space: normal; width: 86vw; bottom: 80px; }
+      #copy p { font-size: 12px; line-height: 1.4; }
+      #copy p + p { margin-top: 8px; }
+      #linkedin { bottom: 24px; left: 24px; }
+      #shuffle-btn { bottom: 24px; right: 24px; }
+      #ink-trigger-wrap { top: 24px; }
     }
-
-    @media (hover: none) {
-      .preview-float { display: none; }
-    }
-
-    /* ─── REDUCED MOTION ─────────────────────────────────────────── */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
+    @media (max-width: 380px) {
+      #logo-wrap svg { width: 94vw; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ─── HEADER ────────────────────────────────────────────────── -->
-  <header class="hdr" id="siteHeader">
-    <div class="hdr-inner">
-      <a class="hdr-brand" href="/">FABRI</a>
-      <nav class="hdr-nav">
-        <a href="#work">Work</a>
-        <a href="#about">About</a>
-      </nav>
+  <!-- Custom cursor: outer shell positions, inner GSAP-scales on press -->
+  <div id="cursor">
+    <div id="cursor-hint">Click and drag</div>
+    <div id="cursor-inner">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <mask id="cursor-mask" fill="white">
+          <path d="M0 14.9632C0 6.69925 6.69925 0 14.9632 0C23.2271 0 29.9264 6.69925 29.9264 14.9632C29.9264 23.2271 23.2271 29.9264 14.9632 29.9264C6.69925 29.9264 0 23.2271 0 14.9632Z"/>
+        </mask>
+        <path d="M0 14.9632C0 6.69925 6.69925 0 14.9632 0C23.2271 0 29.9264 6.69925 29.9264 14.9632C29.9264 23.2271 23.2271 29.9264 14.9632 29.9264C6.69925 29.9264 0 23.2271 0 14.9632Z" fill="white" fill-opacity="0.01"/>
+        <path d="M14.9632 29.9264V27.7888C7.87982 27.7888 2.1376 22.0466 2.1376 14.9632H-2.1376C-2.1376 24.4077 5.51869 32.064 14.9632 32.064V29.9264ZM29.9264 14.9632H27.7888C27.7888 22.0466 22.0466 27.7888 14.9632 27.7888V32.064C24.4077 32.064 32.064 24.4077 32.064 14.9632H29.9264ZM14.9632 0V2.1376C22.0466 2.1376 27.7888 7.87982 27.7888 14.9632H32.064C32.064 5.51869 24.4077 -2.1376 14.9632 -2.1376V0ZM14.9632 0V-2.1376C5.51869 -2.1376 -2.1376 5.51869 -2.1376 14.9632H2.1376C2.1376 7.87982 7.87982 2.1376 14.9632 2.1376V0Z" fill="white" mask="url(#cursor-mask)"/>
+      </svg>
     </div>
-  </header>
+  </div>
 
-  <!-- ─── MAIN ──────────────────────────────────────────────────── -->
-  <main>
+  <!-- Logo (static SVG; doubles as the displacement source + graceful fallback) -->
+  <div id="logo-wrap">
+    <svg id="logo-svg" viewBox="0 0 1302 99" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CASAGRANDE">
+      <path d="M62.0098 0C96.5896 0 120.9 15.8594 123.37 39.9092H90.8701C89.3099 31.9793 78.1296 25.6094 62.0098 25.6094C43.6799 25.6095 31.8496 34.9699 31.8496 48.8799C31.8498 63.0496 43.6801 72.539 62.0098 72.5391C78.1298 72.5391 89.3101 66.1695 90.8701 57.9795H123.37C120.9 82.2895 96.5898 98.2793 62.0098 98.2793C24.5701 98.2792 0.000199775 78.9096 0 48.8799C0 19.2399 24.5699 8.23443e-05 62.0098 0ZM316.357 0C353.017 1.2265e-05 372.647 11.0496 373.817 31.8496H342.098C342.098 24.8297 333.647 22.2295 316.098 22.2295C299.458 22.2295 295.558 24.8295 295.558 28.7295C295.558 34.8395 304.397 35.6197 324.938 37.1797C356.657 39.5197 377.718 42.77 377.718 67.21C377.718 90.7396 357.177 98.2793 322.728 98.2793C285.158 98.2793 263.577 89.4393 262.277 64.7393H294.127C294.127 71.4993 301.148 75.9199 321.428 75.9199C342.227 75.9199 345.997 73.0597 345.997 68.25C345.997 61.36 336.507 61.0998 315.837 59.7998C279.177 57.7198 263.837 48.7494 263.837 28.7295C263.837 9.6195 284.247 0 316.357 0ZM581.402 0C616.762 8.52703e-05 640.682 14.8194 642.372 36.7891H609.872C608.182 30.6792 597.392 25.2197 581.662 25.2197C561.512 25.2197 549.682 35.4894 549.682 49.5293C549.682 64.6092 562.812 73.1894 585.302 73.1895C595.832 73.1895 607.532 71.6296 617.412 67.5996V61.6191H579.062V43.4199H642.372V83.7197C627.942 93.2096 605.062 98.2792 583.482 98.2793C543.702 98.2793 517.832 79.1693 517.832 49.5293C517.832 19.3694 542.792 0 581.402 0ZM259.805 95.6797H226.135L218.075 78.2598H164.775L156.715 95.6797H123.045L171.925 2.08008H211.055L259.805 95.6797ZM518.021 95.6797H484.352L476.292 78.2598H422.992L414.932 95.6797H381.262L430.142 2.08008H469.271L518.021 95.6797ZM735.019 2.08008C760.629 2.08008 773.239 11.9596 773.239 30.8096C773.239 43.6794 766.089 52.2592 753.739 56.0293C765.959 56.6794 773.239 63.4399 773.239 75.0098V95.6797H742.688V80.0801C742.688 71.6301 740.348 69.1592 732.028 69.1592H689.519V95.6797H658.969V2.08008H735.019ZM922.932 95.6797H889.262L881.202 78.2598H827.902L819.842 95.6797H786.172L835.052 2.08008H874.182L922.932 95.6797ZM1027.4 66.4297V2.08008H1057.95V95.6797H1013.75L965.001 31.1992V95.6797H934.451V2.08008H978.651L1027.4 66.4297ZM1143.9 2.08008C1170.94 2.08031 1190.57 21.7102 1190.57 48.75C1190.57 75.9196 1170.94 95.6794 1143.9 95.6797H1077.21V2.08008H1143.9ZM1301.54 25.0898H1236.67V38.2197H1298.95V59.2793H1236.67V72.6699H1301.54V95.6797H1206.12V2.08008H1301.54V25.0898ZM1107.76 69.9395H1131.55C1150.01 69.9395 1158.98 62.9197 1158.98 48.75C1158.98 34.84 1150.01 27.8193 1131.55 27.8193H1107.76V69.9395ZM174.915 56.29H207.935L191.425 20.6699L174.915 56.29ZM433.132 56.29H466.151L449.642 20.6699L433.132 56.29ZM838.042 56.29H871.062L854.552 20.6699L838.042 56.29ZM689.519 45.2393H727.999C736.449 45.2392 742.429 43.6791 742.429 35.6191C742.428 27.4296 736.449 26 727.999 26H689.519V45.2393Z" fill="white"/>
+    </svg>
+  </div>
 
-    <!-- Top spacer matching niklas.space h-56 -->
-    <div class="top-spacer"></div>
+  <!-- Bottom copy -->
+  <div id="copy">
+    <p>Designing products, services and experiences for humans.</p>
+    <p>Page coming soon. For now, play around with some colors :)</p>
+  </div>
 
-    <!-- INTRO -->
-    <section class="intro">
-      <div class="col">
-        <p class="intro-p">
-          Design for humans.<br>
-          <span class="intro-muted">And machines too.</span>
-        </p>
-      </div>
-    </section>
+  <!-- LinkedIn -->
+  <a id="linkedin" data-aura href="https://www.linkedin.com/in/fabricasagrande/" target="_blank" rel="noopener noreferrer">
+    LinkedIn
+    <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
+      <path d="M1 1h7M8 1v7M1 8l7-7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </a>
 
-    <!-- WORK -->
-    <section id="work">
-      <div class="col">
-        <div class="project-list" id="projectList">
+  <!-- Top brand glyphs — exact exported Figma ISO-S asset -->
+  <div id="ink-trigger-wrap" aria-hidden="true">
+    <div id="ink-trigger" data-aura>
+      <img src="ink-trigger-icons.svg" alt="" class="ink-trigger-icons" draggable="false">
+    </div>
+  </div>
 
-          <div class="project-item" data-project="simone">
-            <a class="project-row" href="simone.html">
-              <span class="project-name">SimONE</span>
-              <span class="project-desc">Making clinical education feel less like content and more like participation.</span>
-            </a>
-          </div>
+  <!-- Shuffle → "SWAP COLORS" pill (latest Figma frame); exact exported icon -->
+  <button id="shuffle-btn" data-aura aria-label="Swap colors">
+    Swap colors
+    <img src="swap-colors-icon.svg" alt="" class="swap-icon" draggable="false">
+  </button>
 
-          <div class="project-item" data-project="meta">
-            <a class="project-row" href="metapatient.html">
-              <span class="project-name">MetaPatient</span>
-              <span class="project-desc">Designing conversations for healthcare. A new approach to AI, communication, and human behavior.</span>
-            </a>
-          </div>
+  <!-- Full-viewport pointer tracker for canvas aura -->
+  <div id="canvas-tracker"></div>
 
-          <div class="project-item" data-project="nexus">
-            <a class="project-row" href="nexus.html">
-              <span class="project-name">Nexus Smart</span>
-              <span class="project-desc">Helping transportation systems move people, not just vehicles. Built for real-world operations in Colombia.</span>
-            </a>
-          </div>
+  <!-- Global canvas interaction affordance -->
+  <div id="canvas-aura"><div id="canvas-aura-inner"></div></div>
 
-          <!-- No link — like niklas.space's non-clickable "Lovable" item -->
-          <div class="project-item" data-project="ilb">
-            <div class="project-row">
-              <span class="project-name">Interactive Learning Booth</span>
-              <span class="project-desc">A physical learning experience designed around interaction, attention, and shared participation. Soon.</span>
-            </div>
-          </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
-        </div>
-      </div>
-    </section>
+  <script type="module">
+    import InteractiveInkBackground from './interactive-ink.js';
 
-    <!-- ABOUT — same visual row rhythm, pushed down -->
-    <section class="bottom" id="about">
-      <div class="col">
+    const logoWrap = document.getElementById('logo-wrap');
+    const logoSvg  = document.getElementById('logo-svg');
 
-        <div class="bottom-row">
-          <span class="bottom-name">About</span>
-          <span class="bottom-desc">Designing systems, products and services.<br>Working between people and technology.</span>
-        </div>
+    /* ── Desktop detection (needed before ink init for displacement tuning) ── */
+    const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-        <div class="bottom-row">
-          <span class="bottom-name">Worked with</span>
-          <span class="bottom-desc">Pfizer · AbbVie · AstraZeneca · Daiichi Sankyo<br>Astellas · Amgen · Merck · TransMilenio</span>
-        </div>
+    /* ── Ink simulation, with the CASAGRANDE logo displaced by the live fluid ── */
+    const ink = new InteractiveInkBackground({
+      palette: 'mixed',
+      logo: {
+        svg: logoSvg.outerHTML,   // same artwork as the DOM fallback
+        aspect: 1302 / 99,        // matches the SVG viewBox + CSS layout
+        minWidth: 280,
+        vwFraction: 0.76,
+        maxWidth: 1302,
+        offsetY: -13,             // matches #logo-wrap translateY(-13px)
+        // Desktop: 25–35% stronger displacement for clearer read.
+        // Mobile: keep subtle (readability + performance).
+        dispScale:       isDesktop ? 0.055 : 0.04,
+        maxDisplacement: isDesktop ? 7     : 5,
+        pad: 0.10,                // transparent texture padding (each side)
+        // Hide the static DOM logo only once the GPU logo is live; on fallback
+        // (mobile / no-WebGL2 / slow devices) the original SVG stays untouched.
+        onActive: (active) => logoWrap.classList.toggle('gl-active', active),
+      },
+    });
 
-        <div class="bottom-row">
-          <span class="bottom-name">Currently</span>
-          <span class="bottom-desc">Interactive Design Lead at Lucea.<br>Building tools for learning at scale.</span>
-        </div>
+    /* ── Custom cursor + canvas/button auras ──────────────────────────── */
+    const cursorEl    = document.getElementById('cursor');
+    const cursorInner = document.getElementById('cursor-inner');
+    const auraOuter   = document.getElementById('canvas-aura');
+    const auraInner   = document.getElementById('canvas-aura-inner');
 
-        <div class="bottom-row">
-          <span class="bottom-name">Contact</span>
-          <span class="bottom-desc">
-            <a href="mailto:fabricasagrande.uy@gmail.com">fabricasagrande.uy@gmail.com</a>
-          </span>
-        </div>
+    let canvasState = 'hidden';   // 'hidden' | 'rest' | 'active'
 
-        <footer class="site-footer">
-          <span class="footer-copy">© 2026 Fabrizio Casagrande</span>
-        </footer>
+    // Canvas aura: gradient alphas are baked in so element opacity is pure show/hide (0 or 1).
+    // 'active' compresses the aura away to reinforce the feeling of pressing into the canvas.
+    function setCanvasAura(state) {
+      if (state === canvasState) return;
+      canvasState = state;
+      if (state === 'hidden')
+        gsap.to(auraInner, { opacity: 0, scale: 1,   duration: 0.22, ease: 'power2.out', overwrite: true });
+      else if (state === 'rest')
+        gsap.to(auraInner, { opacity: 1, scale: 1,   duration: 0.25, ease: 'power2.out', overwrite: true });
+      else if (state === 'active')
+        gsap.to(auraInner, { opacity: 0, scale: 0.3, duration: 0.14, ease: 'power2.in',  overwrite: true });
+    }
 
-      </div>
-    </section>
+    if (isDesktop) {
+      const hintEl = document.getElementById('cursor-hint');
+      let hintDismissed    = false;
+      let trackerPtrDown   = false;   // pointer is currently pressed on the canvas
 
-  </main>
+      // Custom cursor: position on every mousemove.
+      document.addEventListener('mousemove', (e) => {
+        cursorEl.style.transform = `translate(${e.clientX - 15}px,${e.clientY - 15}px)`;
+      });
+      // Ring: compress on press (no bounce on release — power2.out for clean return).
+      // Brightness uses a CSS transition (filter) separate from GSAP's transform.
+      document.addEventListener('mousedown', () => {
+        cursorInner.style.filter = 'brightness(1.5)';
+        gsap.to(cursorInner, { scale: 0.86, duration: 0.10, ease: 'power2.out', overwrite: true });
+      });
+      document.addEventListener('mouseup', () => {
+        cursorInner.style.filter = '';
+        gsap.to(cursorInner, { scale: 1,    duration: 0.20, ease: 'power2.out', overwrite: true });
+      });
 
-  <!-- ─── FLOATING PREVIEW ──────────────────────────────────────── -->
-  <div class="preview-float" id="previewFloat" aria-hidden="true"></div>
+      // Canvas aura — driven by #canvas-tracker (position: fixed; inset: 0; z-index: 1).
+      // When the cursor enters a UI element (z ≥ 10), that element wins hit-testing and
+      // the tracker fires pointerleave, hiding the aura with no flag or manual check.
+      const tracker = document.getElementById('canvas-tracker');
 
-  <script>
-    /* ─── HEADER: frosted glass on scroll ───────────────────────── */
-    const hdr = document.getElementById('siteHeader');
-    window.addEventListener('scroll', () => {
-      hdr.classList.toggle('scrolled', window.scrollY > 8);
-    }, { passive: true });
+      tracker.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        auraOuter.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
+        setCanvasAura('rest');
+      });
+      tracker.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        auraOuter.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
+        // Dismiss the hint on first canvas drag (any move while pointer is pressed).
+        if (trackerPtrDown && !hintDismissed) {
+          hintDismissed = true;
+          gsap.to(hintEl, { opacity: 0, duration: 0.5, ease: 'power2.out',
+            onComplete: () => { hintEl.style.display = 'none'; } });
+        }
+      });
+      tracker.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        trackerPtrDown = true;
+        setCanvasAura('active');
+      });
+      tracker.addEventListener('pointerup', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        trackerPtrDown = false;
+        setCanvasAura('rest');
+      });
+      tracker.addEventListener('pointerleave', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        trackerPtrDown = false;
+        setCanvasAura('hidden');
+      });
 
-    /* ─── FLOATING PREVIEW ───────────────────────────────────────── */
-    const float    = document.getElementById('previewFloat');
-    const projList = document.getElementById('projectList');
-
-    let mouseX = 0, mouseY = 0;
-    let curX   = 0, curY   = 0;
-    let rafId  = null;
-    let showTimer = null;
-
-    const PREVIEWS = {
-      simone: `
-        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;overflow:hidden;">
-          <div style="position:absolute;inset:0;
-               background:linear-gradient(rgba(242,96,12,0.07) 1px,transparent 1px),
-                          linear-gradient(90deg,rgba(242,96,12,0.07) 1px,transparent 1px);
-               background-size:24px 24px;"></div>
-          <div style="position:absolute;left:0;right:0;height:1px;
-               background:rgba(242,96,12,0.6);box-shadow:0 0 8px rgba(242,96,12,0.35);
-               animation:scanline 2.2s linear infinite;"></div>
-          <div style="position:absolute;top:50%;left:50%;
-               transform:translate(-50%,-52%);display:flex;gap:8px;align-items:flex-end;">
-            <div style="width:54px;height:70px;border-radius:3px;
-                 background:rgba(242,96,12,0.18);border:1px solid rgba(242,96,12,0.4);"></div>
-            <div style="width:54px;height:58px;border-radius:3px;
-                 background:rgba(242,96,12,0.1);border:1px solid rgba(242,96,12,0.2);"></div>
-            <div style="width:54px;height:44px;border-radius:3px;
-                 background:rgba(242,96,12,0.05);border:1px solid rgba(242,96,12,0.1);"></div>
-          </div>
-          <div style="position:absolute;bottom:14px;left:16px;
-               font-family:'Red Hat Mono',monospace;font-size:9px;
-               letter-spacing:0.14em;text-transform:uppercase;
-               color:rgba(242,96,12,0.65);">SimONE — Clinical Learning</div>
-        </div>`,
-
-      meta: `
-        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;
-             overflow:hidden;padding:22px 18px 18px;">
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="max-width:210px;background:rgba(107,92,231,0.2);
-                 border:1px solid rgba(107,92,231,0.35);
-                 border-radius:12px 12px 12px 3px;padding:7px 11px;
-                 font-family:'Red Hat Mono',monospace;font-size:9.5px;line-height:1.5;
-                 color:rgba(255,255,255,0.45);
-                 animation:bubble-in 0.3s ease 0.1s both;">
-              Good morning. How are you feeling today?
-            </div>
-            <div style="max-width:190px;align-self:flex-end;
-                 background:rgba(107,92,231,0.11);border:1px solid rgba(107,92,231,0.2);
-                 border-radius:12px 12px 3px 12px;padding:7px 11px;
-                 font-family:'Red Hat Mono',monospace;font-size:9.5px;line-height:1.5;
-                 color:rgba(255,255,255,0.3);
-                 animation:bubble-in 0.3s ease 0.38s both;">
-              A little anxious about surgery tomorrow.
-            </div>
-          </div>
-          <div style="position:absolute;bottom:17px;left:18px;
-               display:flex;gap:4px;align-items:center;">
-            <div style="width:5px;height:5px;border-radius:50%;
-                 background:rgba(107,92,231,0.8);
-                 animation:dotpulse 1.4s ease infinite;animation-delay:0s;"></div>
-            <div style="width:5px;height:5px;border-radius:50%;
-                 background:rgba(107,92,231,0.8);
-                 animation:dotpulse 1.4s ease infinite;animation-delay:0.2s;"></div>
-            <div style="width:5px;height:5px;border-radius:50%;
-                 background:rgba(107,92,231,0.8);
-                 animation:dotpulse 1.4s ease infinite;animation-delay:0.4s;"></div>
-          </div>
-          <div style="position:absolute;bottom:14px;right:16px;
-               font-family:'Red Hat Mono',monospace;font-size:9px;
-               letter-spacing:0.14em;text-transform:uppercase;
-               color:rgba(107,92,231,0.65);">MetaPatient</div>
-        </div>`,
-
-      nexus: `
-        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;
-             overflow:hidden;padding:18px 16px;">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;">
-            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
-            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
-            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
-            <div style="height:26px;border-radius:2px;background:#D63080;
-                 animation:blink 1.1s ease infinite;"></div>
-            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
-            <div style="height:26px;border-radius:2px;background:rgba(255,255,255,.1);"></div>
-            <div style="height:26px;border-radius:2px;background:#00B89A;opacity:.8;"></div>
-            <div style="height:26px;border-radius:2px;background:#F59E0B;opacity:.85;"></div>
-          </div>
-          <div style="height:1px;background:rgba(214,48,128,.2);margin-bottom:10px;"></div>
-          <div style="font-family:'Red Hat Mono',monospace;font-size:9px;
-               color:rgba(214,48,128,.65);letter-spacing:.1em;text-transform:uppercase;">
-            1 alert · 14 stations active
-          </div>
-          <div style="position:absolute;bottom:14px;right:16px;
-               font-family:'Red Hat Mono',monospace;font-size:9px;
-               letter-spacing:.14em;text-transform:uppercase;
-               color:rgba(214,48,128,.65);">Nexus Smart</div>
-        </div>`,
-
-      ilb: `
-        <div style="width:100%;height:100%;position:relative;background:#0D0D0D;overflow:hidden;
-             display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;">
-          <div style="width:48px;height:48px;border-radius:50%;
-               background:rgba(0,184,154,.12);border:1px solid rgba(0,184,154,.35);
-               display:flex;align-items:center;justify-content:center;">
-            <div style="width:10px;height:10px;border-radius:50%;background:#00B89A;
-                 animation:dotpulse 2s ease infinite;"></div>
-          </div>
-          <div style="font-family:'Red Hat Mono',monospace;font-size:9px;
-               letter-spacing:.2em;text-transform:uppercase;color:rgba(0,184,154,.65);">
-            Coming soon
-          </div>
-        </div>`
-    };
-
-    /* ─── CURSOR TRACKING ────────────────────────────────────────── */
-    document.addEventListener('mousemove', e => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    }, { passive: true });
-
-    function startFollow(snap) {
-      if (snap) { curX = mouseX; curY = mouseY; }
-      if (rafId) return;
-
-      const tick = () => {
-        curX += (mouseX - curX) * 0.14;
-        curY += (mouseY - curY) * 0.14;
-
-        const W = 320, H = 200, OX = 24, OY = -90;
-        let x = curX + OX;
-        let y = curY + OY;
-
-        /* flip to left of cursor if near right edge */
-        if (x + W > window.innerWidth  - 16) x = curX - W - OX;
-        /* clamp vertically */
-        if (y < 16) y = 16;
-        if (y + H > window.innerHeight - 16) y = window.innerHeight - H - 16;
-
-        float.style.left = x + 'px';
-        float.style.top  = y + 'px';
-        rafId = requestAnimationFrame(tick);
+      // Per-button aura: local radial glow tracking cursor within each control.
+      const registerAura = (el) => {
+        let rect = null;
+        const setVars = (e) => {
+          el.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+          el.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+        };
+        el.addEventListener('pointerenter', (e) => {
+          if (e.pointerType === 'touch') return;
+          rect = el.getBoundingClientRect();
+          setVars(e);
+          el.classList.add('is-aura-active');
+        });
+        el.addEventListener('pointermove', (e) => { if (rect) setVars(e); });
+        el.addEventListener('pointerleave', () => {
+          el.classList.remove('is-aura-active');
+          rect = null;
+        });
       };
-      rafId = requestAnimationFrame(tick);
+      document.querySelectorAll('[data-aura]').forEach(registerAura);
     }
 
-    function stopFollow() {
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    /* ── Touch canvas aura ─────────────────────────────────────────────
+       UI elements call stopPropagation on pointer events, so document-level
+       listeners here naturally activate only when touch lands on the canvas
+       background — not on buttons. Appears only during active touch/drag,
+       fades out on release, never shows as a permanent affordance. ───── */
+    {
+      const touchIds = new Set();
+      document.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'touch') return;
+        touchIds.add(e.pointerId);
+        auraOuter.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
+        setCanvasAura('active');
+      }, { passive: true });
+      document.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'touch' || !touchIds.has(e.pointerId)) return;
+        auraOuter.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
+      }, { passive: true });
+      const onTouchRelease = (e) => {
+        if (e.pointerType !== 'touch') return;
+        touchIds.delete(e.pointerId);
+        if (touchIds.size === 0) setCanvasAura('hidden');
+      };
+      document.addEventListener('pointerup',     onTouchRelease, { passive: true });
+      document.addEventListener('pointercancel', onTouchRelease, { passive: true });
     }
 
-    /* ─── HOVER EVENTS ───────────────────────────────────────────── */
-    projList.querySelectorAll('.project-item').forEach(item => {
-      const key = item.dataset.project;
+    /* ── Keep ink from painting under the fixed UI controls ───────────── */
+    ['ink-trigger-wrap', 'linkedin', 'shuffle-btn'].forEach((id) => {
+      const el = document.getElementById(id);
+      ['pointerdown', 'pointermove', 'pointerup'].forEach((ev) =>
+        el.addEventListener(ev, (e) => e.stopPropagation())
+      );
+    });
 
-      item.addEventListener('mouseenter', () => {
-        projList.classList.add('hovered');
-        item.classList.add('active');
+    /* ── Shuffle: re-roll a stable, attractive ink mood ───────────────── */
+    const PALETTES = ['violet', 'mixed', 'mixed', 'amber'];
+    const rnd = (lo, hi) => +(Math.random() * (hi - lo) + lo).toFixed(2);
 
-        clearTimeout(showTimer);
-        showTimer = setTimeout(() => {
-          if (!PREVIEWS[key]) return;
-          float.innerHTML = PREVIEWS[key];
-          float.classList.add('visible');
-          startFollow(true);
-        }, 80);
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    shuffleBtn.addEventListener('click', () => {
+      ink.set({
+        palette:     PALETTES[Math.floor(Math.random() * PALETTES.length)],
+        intensity:   rnd(0.6, 1.6),
+        radius:      rnd(0.5, 1.8),
+        dissipation: rnd(0.5, 1.8),
+        curl:        rnd(0.4, 2.0),
       });
-
-      item.addEventListener('mouseleave', () => {
-        projList.classList.remove('hovered');
-        item.classList.remove('active');
-        clearTimeout(showTimer);
-        float.classList.remove('visible');
-        stopFollow();
-      });
+      // Subtle glow flash — feedback without spinning the icon
+      gsap.fromTo(shuffleBtn,
+        { boxShadow: '0 0 0 1px rgba(255,255,255,0.35), 0 0 18px rgba(255,255,255,0.12)' },
+        { boxShadow: '0 0 0 0px rgba(255,255,255,0)', duration: 0.55, ease: 'power2.out', overwrite: true }
+      );
     });
   </script>
 
