@@ -37,6 +37,7 @@ const DEFAULTS = {
   container: null,         // defaults to document.body
   target: null,            // pointer-event target; defaults to window
   zIndex: 0,
+  logo: null,              // optional fluid-displaced logo (see _initLogo)
 };
 
 /* Internal simulation constants (tuned for the premium look). ----------------*/
@@ -398,6 +399,60 @@ const displayShader = `
   }
 `;
 
+/* Logo refraction pass — subtly warps the artwork using the LIVE fluid fields.
+ *
+ * ONE logo, one result. Per fragment we take the original sample and a
+ * velocity-displaced sample of the SAME texture, then blend between them by a
+ * localized ink mask:  out = mix(original, displaced, mask).
+ *   • mask == 0 (no ink) → output is EXACTLY the original logo.
+ *   • mask  > 0 (ink)    → smoothly interpolate toward the displaced sample.
+ * The displacement itself also scales with the mask, so it fades to zero outside
+ * ink and stays tiny inside it. There is never a full displaced layer drawn over
+ * a full static layer — so no ghost / duplicate / offset outline. It reads as
+ * refraction inside the single white logo. The artwork lives in a transparent-
+ * padded texture and every sample UV is clamped to [0,1], so a displaced sample
+ * near an edge reads transparent padding, not a CLAMP_TO_EDGE smear of the glyph
+ * contour. Output is premultiplied → blend with (ONE, ONE_MINUS_SRC_ALPHA). ----*/
+const logoShader = `
+  precision highp float;
+  precision highp sampler2D;
+  varying vec2 vUv;
+  uniform sampler2D uLogo;       // padded artwork (white, alpha = coverage)
+  uniform sampler2D uVelocity;   // live fluid velocity field
+  uniform sampler2D uDye;        // live ink density field
+  uniform vec2 uResolution;      // viewport size in CSS px
+  uniform vec4 uLogoRect;        // PADDED logo quad in CSS px: x, y, width, height
+  uniform float uDispScale;      // velocity → px gain
+  uniform float uMaxPx;          // displacement ceiling (px)
+  void main () {
+    // Fragment position in CSS px (y-down) → padded-logo UV.
+    vec2 px  = vec2(vUv.x * uResolution.x, (1.0 - vUv.y) * uResolution.y);
+    vec2 luv = (px - uLogoRect.xy) / uLogoRect.zw;
+    if (luv.x < 0.0 || luv.x > 1.0 || luv.y < 0.0 || luv.y > 1.0) discard;
+
+    // Localized ink mask (soft threshold) — tight to the actual ink influence.
+    vec3 dye = texture2D(uDye, vUv).rgb;
+    float amount = max(dye.r, max(dye.g, dye.b));
+    float mask = smoothstep(0.06, 0.50, amount);
+
+    // Original + velocity-displaced samples of the SAME texture. Displacement
+    // scales with the mask, so it disappears outside ink and stays subtle inside.
+    vec2 vel = texture2D(uVelocity, vUv).xy;
+    vec2 dispPx = clamp(vel * uDispScale, -uMaxPx, uMaxPx) * mask;
+    vec2 dispUV = vec2(dispPx.x, -dispPx.y) / uLogoRect.zw;
+    vec4 orig = texture2D(uLogo, clamp(luv, 0.0, 1.0));
+    vec4 disp = texture2D(uLogo, clamp(luv + dispUV, 0.0, 1.0));
+
+    // Single composited result: blend original → displaced by the mask, in
+    // premultiplied alpha. No second silhouette is ever drawn.
+    vec4 origPM = vec4(orig.rgb * orig.a, orig.a);
+    vec4 dispPM = vec4(disp.rgb * disp.a, disp.a);
+    vec4 outPM  = mix(origPM, dispPM, mask);
+    if (outPM.a < 0.004) discard;                    // keep ink visible in counters
+    gl_FragColor = outPM;
+  }
+`;
+
 /* ─── GL HELPERS ────────────────────────────────────────────────────────── */
 function getWebGLContext(canvas) {
   const params = {
@@ -534,12 +589,38 @@ export class InteractiveInkBackground {
     this.lastInteraction = 0;
     this.destroyed = false;
 
+    // ── optional fluid-displaced logo ──────────────────────────────────────
+    this.logo = null;
+    this.logoEnabled = false;     // capability + runtime watchdog gate
+    this.logoActive  = false;     // currently compositing the GL logo?
+    this.logoTexture = null;
+    if (this.opts.logo && this.opts.logo.svg) {
+      const L = this.opts.logo;
+      this.logo = {
+        svg: L.svg,
+        aspect:          L.aspect          != null ? L.aspect          : 1302 / 99,
+        minWidth:        L.minWidth        != null ? L.minWidth        : 280,
+        maxWidth:        L.maxWidth        != null ? L.maxWidth        : 1302,
+        vwFraction:      L.vwFraction      != null ? L.vwFraction      : 0.76,
+        offsetY:         L.offsetY         != null ? L.offsetY         : 0,
+        dispScale:       L.dispScale       != null ? L.dispScale       : 0.04,
+        maxDisplacement: L.maxDisplacement != null ? L.maxDisplacement : 5,   // hard ceiling
+        pad:             L.pad             != null ? L.pad             : 0.10, // transparent border (each side)
+        onActive:        typeof L.onActive === 'function' ? L.onActive : null,
+      };
+    }
+    // perf watchdog: drop the displaced logo (→ static fallback) if fps tanks
+    this._rafIntervals = [];
+    this._prevRaf = 0;
+    this._logoWatchdogTripped = false;
+
     this._createCanvas();
 
     const ctx = getWebGLContext(this.canvas);
     if (!ctx) {
       // No WebGL at all → leave the (black) canvas in place, do nothing else.
       this.unsupported = true;
+      this._notifyLogo(false);   // ensure the static SVG fallback stays visible
       return;
     }
     this.gl = ctx.gl;
@@ -549,6 +630,7 @@ export class InteractiveInkBackground {
     // prefers-reduced-motion → static black, no simulation, no listeners.
     if (this.reduceMotion) {
       this._clearScreen();
+      this._notifyLogo(false);   // keep the original static SVG, undistorted
       return;
     }
 
@@ -621,9 +703,11 @@ export class InteractiveInkBackground {
       prefilter:   this._program(vs, bloomPrefilterShader),
       blur:        this._program(vs, bloomBlurShader),
       display:     this._program(vs, displayShader),
+      logo:        this._program(vs, logoShader),
     };
 
     this._initFramebuffers();
+    this._initLogo();
   }
 
   _program(vs, fsSource, keywords) {
@@ -771,6 +855,133 @@ export class InteractiveInkBackground {
     gl.clear(gl.COLOR_BUFFER_BIT);
   }
 
+  /* ── fluid-displaced logo ────────────────────────────────────────────── */
+  _notifyLogo(active) {
+    this.logoActive = active;
+    if (this.logo && this.logo.onActive) {
+      try { this.logo.onActive(active); } catch (e) { /* host callback */ }
+    }
+  }
+
+  // Capability gate for the GPU-displaced logo. Requires WebGL2 + linear-float
+  // textures (needed for the fluid FBOs). Allows both fine-pointer (mouse) and
+  // coarse-pointer (touch/stylus) — mobile is explicitly supported. Only blocks
+  // genuinely tiny screens where the logo wouldn't be legible regardless.
+  // Runtime performance is handled by the FPS watchdog in _watchLogoPerf().
+  _logoCapable() {
+    if (!this.logo || !this.isWebGL2 || !this.ext.supportLinearFiltering) return false;
+    return Math.min(window.innerWidth, window.innerHeight) >= 320;
+  }
+
+  _initLogo() {
+    if (!this._logoCapable()) { this.logoEnabled = false; this._notifyLogo(false); return; }
+    this.logoEnabled = true;
+
+    const gl = this.gl;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const inner = 1 - 2 * this.logo.pad;               // fraction occupied by artwork
+
+    // Texture = padded canvas; the artwork is drawn inset by `pad` on every side
+    // so a displaced sample near an edge reads TRANSPARENT padding, never a
+    // clamped glyph contour. Content is sized for crisp 1:1 at the displayed size.
+    const maxTex = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+    const rw = Math.min(2560, maxTex, Math.round((this.logo.maxWidth * dpr) / inner));
+    const rh = Math.max(2, Math.round(rw / this.logo.aspect));
+    const cw = Math.max(1, Math.round(rw * inner));     // content width
+    const ch = Math.max(1, Math.round(rh * inner));     // content height
+    const ox = Math.round((rw - cw) / 2);
+    const oy = Math.round((rh - ch) / 2);
+
+    // Force an explicit pixel size onto the SVG root so it rasterises sharply
+    // and consistently across browsers (viewBox alone is unreliable here).
+    const markup = this.logo.svg.replace(/<svg([^>]*?)>/i, (m, attrs) => {
+      const cleaned = attrs.replace(/\s(width|height)="[^"]*"/gi, '');
+      return `<svg${cleaned} width="${cw}" height="${ch}">`;
+    });
+
+    const img = new Image();
+    img.decoding = 'async';
+    this._logoImg = img;
+    img.onload = () => {
+      if (this.destroyed || !this.logoEnabled) return;
+      try {
+        const c = document.createElement('canvas');
+        c.width = rw; c.height = rh;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, rw, rh);                    // transparent padding
+        ctx.drawImage(img, ox, oy, cw, ch);             // artwork inset
+
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
+        this.logoTexture = tex;
+
+        this._notifyLogo(true);            // host hides its static DOM logo
+        if (!this.running) this._drawIdleFrame();   // paint the static GL logo now
+      } catch (e) {
+        this.logoEnabled = false;
+        this._notifyLogo(false);
+      }
+    };
+    img.onerror = () => { this.logoEnabled = false; this._notifyLogo(false); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(markup);
+  }
+
+  // PADDED logo quad in CSS px. The VISIBLE logo mirrors the page's CSS layout
+  // (clamp(minWidth, vwFraction·vw, maxWidth), centred, nudged by offsetY); we
+  // then grow the quad by `pad` on every side so [0,1] maps to the padded
+  // texture (the visible artwork sits in its inner [pad, 1-pad] region).
+  _computeLogoRect() {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const L = this.logo;
+    let w = Math.min(Math.max(L.minWidth, vw * L.vwFraction), L.maxWidth);
+    w = Math.min(w, vw * 0.94);
+    const h = w / L.aspect;
+    const inner = 1 - 2 * L.pad;
+    const wp = w / inner, hp = h / inner;          // padded quad size
+    const cx = vw / 2, cy = vh / 2 + L.offsetY;    // visible-logo centre
+    return { vw, vh, w: wp, h: hp, left: cx - wp / 2, top: cy - hp / 2 };
+  }
+
+  _drawLogo() {
+    if (!this.logo || !this.logoEnabled || !this.logoTexture) return;
+    const gl = this.gl;
+    const r = this._computeLogoRect();
+    const prog = this.programs.logo;
+
+    gl.useProgram(prog.program);
+    if (prog.uniforms.texelSize) gl.uniform2f(prog.uniforms.texelSize, 0, 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.logoTexture);
+    gl.uniform1i(prog.uniforms.uLogo, 0);
+    gl.uniform1i(prog.uniforms.uVelocity, this.velocity.read.attach(1));
+    gl.uniform1i(prog.uniforms.uDye, this.dye.read.attach(2));
+    gl.uniform2f(prog.uniforms.uResolution, r.vw, r.vh);
+    gl.uniform4f(prog.uniforms.uLogoRect, r.left, r.top, r.w, r.h);
+    gl.uniform1f(prog.uniforms.uDispScale, this.logo.dispScale);
+    gl.uniform1f(prog.uniforms.uMaxPx, this.logo.maxDisplacement);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);   // shader outputs premultiplied alpha
+    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    gl.disable(gl.BLEND);
+  }
+
+  // Static composite used whenever the sim loop isn't running: pure black + the
+  // (zero-displacement) logo, so the canvas still shows the mark at idle.
+  _drawIdleFrame() {
+    if (!this.gl) return;
+    gl_bind_quad(this.gl, this.quadBuffer, this.indexBuffer);
+    this._clearScreen();
+    this._drawLogo();
+  }
+
   /* ── events ──────────────────────────────────────────────────────────── */
   _bindEvents() {
     this._onDown   = this._handleDown.bind(this);
@@ -786,6 +997,7 @@ export class InteractiveInkBackground {
     window.addEventListener('pointerup', this._onUp, { passive: true });
     window.addEventListener('pointercancel', this._onUp, { passive: true });
     window.addEventListener('resize', this._onResize, { passive: true });
+    window.addEventListener('orientationchange', this._onResize, { passive: true });
     document.addEventListener('visibilitychange', this._onVisibility);
     this.canvas.addEventListener('webglcontextlost', this._onContextLost, false);
   }
@@ -854,6 +1066,8 @@ export class InteractiveInkBackground {
         this._initFramebuffers();
         this._clearScreen();
       }
+      // Repaint the idle logo at the new size when not actively simulating.
+      if (!this.running) this._drawIdleFrame();
     }, 120);
   }
 
@@ -878,12 +1092,13 @@ export class InteractiveInkBackground {
 
   _stopLoop() {
     this.running = false;
+    this._prevRaf = 0;
     if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
     // Guarantee we settle back to pure black (no residue) and free the sim.
     if (this.gl && this.dye) {
       this._clearFBO(this.dye.read); this._clearFBO(this.dye.write);
       this._clearFBO(this.velocity.read); this._clearFBO(this.velocity.write);
-      this._clearScreen();
+      this._drawIdleFrame();   // pure black + the undistorted logo (if active)
     }
   }
 
@@ -902,6 +1117,8 @@ export class InteractiveInkBackground {
     if (!(dt > 0)) dt = 0.016666;
     dt = Math.min(dt, 0.016666); // cap for stability after stalls
 
+    this._watchLogoPerf(now);
+
     gl_bind_quad(this.gl, this.quadBuffer, this.indexBuffer);
 
     this._applyInputs(dt);
@@ -912,6 +1129,25 @@ export class InteractiveInkBackground {
     if (this.pointers.size === 0 && (now - this.lastInteraction) > SETTLE_MS) {
       this._stopLoop();
     }
+  }
+
+  // If real frame intervals stay poor while the displaced logo is on, drop it
+  // (reveal the static SVG) rather than letting the page run slow. Latches once.
+  _watchLogoPerf(now) {
+    if (!this.logoEnabled || this._logoWatchdogTripped) { this._prevRaf = now; return; }
+    if (this._prevRaf) {
+      this._rafIntervals.push(now - this._prevRaf);
+      if (this._rafIntervals.length > 60) this._rafIntervals.shift();
+      if (this._rafIntervals.length >= 50) {
+        const avg = this._rafIntervals.reduce((a, b) => a + b, 0) / this._rafIntervals.length;
+        if (avg > 24) {           // sustained < ~42fps → fall back
+          this._logoWatchdogTripped = true;
+          this.logoEnabled = false;
+          this._notifyLogo(false);
+        }
+      }
+    }
+    this._prevRaf = now;
   }
 
   /* ── inject splats from pointer state (only while pressed) ───────────── */
@@ -1065,6 +1301,9 @@ export class InteractiveInkBackground {
     gl.uniform1f(prog.uniforms.uBloomIntensity, BLOOM_INTENSITY);
     gl.uniform1f(prog.uniforms.uExposure, EXPOSURE);
     this._blit(null);
+
+    // Composite the fluid-displaced logo over the rendered ink.
+    this._drawLogo();
   }
 
   _applyBloom(source, destination) {
@@ -1135,6 +1374,7 @@ export class InteractiveInkBackground {
       window.removeEventListener('pointerup', this._onUp);
       window.removeEventListener('pointercancel', this._onUp);
       window.removeEventListener('resize', this._onResize);
+      window.removeEventListener('orientationchange', this._onResize);
       document.removeEventListener('visibilitychange', this._onVisibility);
       this.canvas.removeEventListener('webglcontextlost', this._onContextLost);
     }
@@ -1142,9 +1382,11 @@ export class InteractiveInkBackground {
     // Release GPU resources.
     const gl = this.gl;
     if (gl) {
+      if (this.logoTexture) { gl.deleteTexture(this.logoTexture); this.logoTexture = null; }
       const lose = gl.getExtension('WEBGL_lose_context');
       if (lose) lose.loseContext();
     }
+    if (this._logoImg) { this._logoImg.onload = this._logoImg.onerror = null; this._logoImg = null; }
     if (this.canvas && this.canvas.parentNode) {
       this.canvas.parentNode.removeChild(this.canvas);
     }
