@@ -869,7 +869,7 @@ export class InteractiveInkBackground {
   // genuinely tiny screens where the logo wouldn't be legible regardless.
   // Runtime performance is handled by the FPS watchdog in _watchLogoPerf().
   _logoCapable() {
-    if (!this.logo || !this.isWebGL2 || !this.ext.supportLinearFiltering) return false;
+    if (!this.logo || !this.isWebGL2) return false;
     return Math.min(window.innerWidth, window.innerHeight) >= 320;
   }
 
@@ -1074,9 +1074,24 @@ export class InteractiveInkBackground {
   _handleVisibility() {
     if (document.hidden) {
       if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
-    } else if (this.running && this.rafId == null) {
+      // Clear pointer state so no inputs get "stuck" while the tab is hidden.
+      this.pointers.clear();
+    } else {
+      // Reset frame-timing so the first RAF after return doesn't push a
+      // multi-second gap into the watchdog window and permanently disable the logo.
+      this._prevRaf = 0;
+      this._rafIntervals = [];
+      if (this._logoWatchdogTripped) {
+        this._logoWatchdogTripped = false;
+        this.logoEnabled = this._logoCapable();
+        this._notifyLogo(this.logoEnabled);
+      }
       this.lastTime = performance.now();
-      this.rafId = requestAnimationFrame(this._loop.bind(this));
+      if (this.running && this.rafId == null) {
+        this.rafId = requestAnimationFrame(this._loop.bind(this));
+      } else if (!this.running) {
+        this._drawIdleFrame();
+      }
     }
   }
 
@@ -1136,11 +1151,13 @@ export class InteractiveInkBackground {
   _watchLogoPerf(now) {
     if (!this.logoEnabled || this._logoWatchdogTripped) { this._prevRaf = now; return; }
     if (this._prevRaf) {
-      this._rafIntervals.push(now - this._prevRaf);
+      const interval = now - this._prevRaf;
+      // Ignore tab-return spikes and other one-off stalls; only count real frame times.
+      if (interval < 150) this._rafIntervals.push(interval);
       if (this._rafIntervals.length > 60) this._rafIntervals.shift();
-      if (this._rafIntervals.length >= 50) {
+      if (this._rafIntervals.length >= 60) {  // need 60 samples before evaluating
         const avg = this._rafIntervals.reduce((a, b) => a + b, 0) / this._rafIntervals.length;
-        if (avg > 24) {           // sustained < ~42fps → fall back
+        if (avg > 33) {           // sustained < 30fps → fall back (mobile-friendly threshold)
           this._logoWatchdogTripped = true;
           this.logoEnabled = false;
           this._notifyLogo(false);
