@@ -4,7 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>CASAGRANDE</title>
-  <meta name="description" content="Designing products, services and experiences for humans.">
+  <meta name="description" content="Designing experiences, products and services. Working between people and technology.">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://casagrande.design/">
+  <meta property="og:title"       content="CASAGRANDE">
+  <meta property="og:description" content="Designing experiences, products and services. Working between people and technology.">
+  <meta property="og:image"       content="https://casagrande.design/og-preview.png?v=1">
+  <meta property="og:image:type"  content="image/png">
+  <meta property="og:image:width" content="1916">
+  <meta property="og:image:height" content="1316">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="CASAGRANDE">
+  <meta name="twitter:description" content="Designing experiences, products and services. Working between people and technology.">
+  <meta name="twitter:image"       content="https://casagrande.design/og-preview.png?v=1">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -226,8 +243,17 @@
       align-items: center;
       gap: 10px;
       cursor: pointer;
+      overflow: hidden;
       transition: background 0.2s, box-shadow 0.3s;
       touch-action: auto;
+    }
+    .shuffle-sweep {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
     }
     #shuffle-btn:hover {
       background: linear-gradient(76.47deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 99.834%);
@@ -339,8 +365,8 @@
 
   <!-- Bottom copy -->
   <div id="copy">
-    <p>Designing products, services and experiences for humans.</p>
-    <p>Page coming soon. For now, play around with some colors :)</p>
+    <p>Designing products, services and experiences for&nbsp;humans.</p>
+    <p>Coming soon. Meanwhile, play around with some&nbsp;colors&nbsp;:)</p>
   </div>
 
   <!-- LinkedIn -->
@@ -372,6 +398,7 @@
       </svg>
     </button>
     <button id="shuffle-btn" data-aura aria-label="Swap colors">
+      <span class="shuffle-sweep" aria-hidden="true"></span>
       Swap colors
       <img src="swap-colors-icon.svg" alt="" class="swap-icon" draggable="false">
     </button>
@@ -552,142 +579,226 @@
     const PALETTES = ['violet', 'mixed', 'mixed', 'amber'];
     const rnd = (lo, hi) => +(Math.random() * (hi - lo) + lo).toFixed(2);
 
+    // RGB palette data mirrored from interactive-ink.js PALETTES constant
+    const PALETTE_COLORS = {
+      violet: [[0.45, 0.18, 0.62], [0.30, 0.23, 0.78], [0.20, 0.32, 0.74], [0.62, 0.16, 0.52]],
+      amber:  [[0.95, 0.55, 0.16], [0.82, 0.40, 0.12], [0.62, 0.26, 0.12], [0.92, 0.72, 0.28]],
+      mixed:  [[0.45, 0.18, 0.62], [0.29, 0.24, 0.80], [0.62, 0.16, 0.52], [0.94, 0.60, 0.20]],
+    };
+
     const shuffleBtn = document.getElementById('shuffle-btn');
+    const sweepEl    = shuffleBtn.querySelector('.shuffle-sweep');
+
+    function _showPaletteSweep(paletteName) {
+      const colors = PALETTE_COLORS[paletteName] || PALETTE_COLORS.mixed;
+      const stops  = colors.map(([r, g, b]) =>
+        `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.55)`
+      ).join(', ');
+      sweepEl.style.background = `linear-gradient(90deg, ${stops})`;
+      sweepEl.style.clipPath   = 'inset(0 100% 0 0 round 12px)';
+      sweepEl.style.opacity    = '1';
+      gsap.killTweensOf(sweepEl);
+      gsap.to(sweepEl, {
+        clipPath: 'inset(0 0% 0 0 round 12px)',
+        duration: 0.32,
+        ease: 'power2.out',
+        overwrite: true,
+        onComplete() {
+          gsap.to(sweepEl, {
+            opacity: 0,
+            duration: 0.34,
+            ease: 'power2.in',
+            onComplete() { sweepEl.style.clipPath = ''; }
+          });
+        }
+      });
+    }
+
     shuffleBtn.addEventListener('click', () => {
+      const paletteName = PALETTES[Math.floor(Math.random() * PALETTES.length)];
       ink.set({
-        palette:     PALETTES[Math.floor(Math.random() * PALETTES.length)],
+        palette:     paletteName,
         intensity:   rnd(0.6, 1.6),
         radius:      rnd(0.5, 1.8),
         dissipation: rnd(0.5, 1.8),
         curl:        rnd(0.4, 2.0),
       });
-      // Subtle glow flash — feedback without spinning the icon
-      gsap.fromTo(shuffleBtn,
-        { boxShadow: '0 0 0 1px rgba(255,255,255,0.35), 0 0 18px rgba(255,255,255,0.12)' },
-        { boxShadow: '0 0 0 0px rgba(255,255,255,0)', duration: 0.55, ease: 'power2.out', overwrite: true }
-      );
+      _showPaletteSweep(paletteName);
     });
 
-    /* ── Web Audio: coordinate-driven ambient sound ────────────────────────
-       Created lazily on first user gesture. Plays only on canvas pointer
-       interactions (UI buttons call stopPropagation, so they never trigger
-       window listeners). X → pitch, Y → filter warmth, velocity → swell,
-       X position → stereo pan. Piano-like sine + detuned octave through
-       a lowpass filter gives a soft, tonal + airy character.             ── */
+    /* ── Web Audio: coordinate-driven deep ambient sound ──────────────────
+       Dark, tactile, sci-fi character. Sub-bass triangle oscillator +
+       sub-octave sine through a resonant lowpass, fed into a synthetic
+       convolution reverb that creates a long spatial tail. Lazy-init on
+       first gesture. UI buttons use stopPropagation so only canvas
+       interactions trigger window listeners and therefore sound.
+
+       X → pitch (50–300 Hz, deep bass range)
+       Y → filter warmth (80–600 Hz cutoff, always in low-frequency realm)
+       velocity → filter resonance Q + gain swell (faster = more intense)
+       X → stereo pan (±0.45)                                            ── */
     const SoundEngine = (() => {
-      let ctx = null;
-      let compressor = null;
-      let masterOut = null;
-      const voices = new Map(); // pointerId → { osc1, osc2, o2g, filter, env, panner }
-      let enabled = sessionStorage.getItem('soundEnabled') !== 'false'; // default ON
+      let ctx           = null;
+      let reverb        = null;
+      let reverbWet     = null;
+      let limiter       = null;
+      let masterOut     = null;
+      const voices      = new Map();
+      const cleanupTimers = new Map(); // pending stop timers, keyed by pointerId
+
+      let enabled = sessionStorage.getItem('soundEnabled') !== 'false';
+
+      // Synthesise a reverb impulse response in memory — no network request.
+      function _makeIR() {
+        const rate  = ctx.sampleRate;
+        const len   = Math.ceil(rate * 2.1);
+        const buf   = ctx.createBuffer(2, len, rate);
+        for (let c = 0; c < 2; c++) {
+          const ch = buf.getChannelData(c);
+          for (let i = 0; i < len; i++)
+            ch[i] = (Math.random() * 2 - 1) * Math.exp(-3.8 * i / len);
+        }
+        return buf;
+      }
 
       function _boot() {
         if (ctx) return;
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        try {
+          ctx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (_) { enabled = false; return; }
 
-        compressor = ctx.createDynamicsCompressor();
-        compressor.threshold.value = -16;
-        compressor.knee.value      = 8;
-        compressor.ratio.value     = 4;
-        compressor.attack.value    = 0.003;
-        compressor.release.value   = 0.25;
+        reverb = ctx.createConvolver();
+        reverb.buffer = _makeIR();
+
+        reverbWet = ctx.createGain();
+        reverbWet.gain.value = 0.42;
+
+        limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.value = -14;
+        limiter.knee.value      = 6;
+        limiter.ratio.value     = 8;
+        limiter.attack.value    = 0.001;
+        limiter.release.value   = 0.3;
 
         masterOut = ctx.createGain();
-        masterOut.gain.value = enabled ? 1 : 0;
+        masterOut.gain.value = enabled ? 0.82 : 0;
 
-        compressor.connect(masterOut);
+        reverb.connect(reverbWet);
+        reverbWet.connect(limiter);
+        limiter.connect(masterOut);
         masterOut.connect(ctx.destination);
       }
 
-      // X: 0 (left) → 200 Hz, 1 (right) → 800 Hz (2 octaves, exponential)
-      function _freq(x) { return 200 * Math.pow(4, Math.max(0, Math.min(1, x))); }
+      function _freq(x)        { return 50 * Math.pow(6, Math.max(0, Math.min(1, x))); }
+      function _cutoff(y, spd) {
+        return Math.min(80 * Math.pow(7.5, 1 - Math.max(0, Math.min(1, y))) + spd * 500, 700);
+      }
+      function _Q(spd) { return 4 + Math.min(spd * 70, 9); }
 
-      // Y: 0 (top of viewport) → 2800 Hz bright, 1 (bottom) → 350 Hz warm
-      function _cutoff(y, speed) {
-        const base = 350 * Math.pow(8, 1 - Math.max(0, Math.min(1, y)));
-        return Math.min(base + speed * 1800, 4000);
+      // Immediately disconnect and remove a voice without waiting for fade.
+      function _destroyVoice(id) {
+        const v = voices.get(id);
+        if (!v) return;
+        try { v.osc1.stop(); v.osc2.stop(); } catch (_) {}
+        [v.osc1, v.osc2, v.o2g, v.filter, v.env, v.panner, v.dryGain].forEach(n => {
+          try { n.disconnect(); } catch (_) {}
+        });
+        voices.delete(id);
       }
 
       function start(id, x, y) {
         if (!enabled) return;
         _boot();
-        if (ctx.state === 'suspended') ctx.resume();
-        if (voices.has(id)) return;
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+        // Cancel any pending cleanup for this id and destroy the stale voice first,
+        // so rapid press-release-press doesn't silently drop the new press.
+        if (cleanupTimers.has(id)) {
+          clearTimeout(cleanupTimers.get(id));
+          cleanupTimers.delete(id);
+          _destroyVoice(id);
+        }
+        if (voices.has(id)) return; // already active (shouldn't happen after above)
 
         const now  = ctx.currentTime;
         const freq = _freq(x);
 
         const osc1 = ctx.createOscillator();
-        osc1.type           = 'sine';
+        osc1.type            = 'triangle';
         osc1.frequency.value = freq;
 
-        // Octave + tiny detune → soft chorus shimmer
         const osc2 = ctx.createOscillator();
-        osc2.type           = 'sine';
-        osc2.frequency.value = freq * 2.006;
+        osc2.type            = 'sine';
+        osc2.frequency.value = freq * 0.501;
 
         const o2g = ctx.createGain();
-        o2g.gain.value = 0.18;
+        o2g.gain.value = 0.55;
 
         const filter = ctx.createBiquadFilter();
-        filter.type             = 'lowpass';
-        filter.frequency.value  = _cutoff(y, 0);
-        filter.Q.value          = 1.0;
+        filter.type            = 'lowpass';
+        filter.frequency.value = _cutoff(y, 0);
+        filter.Q.value         = 5;
 
         const env = ctx.createGain();
         env.gain.setValueAtTime(0, now);
-        env.gain.linearRampToValueAtTime(0.14, now + 0.07); // 70 ms attack
+        env.gain.linearRampToValueAtTime(0.18, now + 0.008); // 8ms attack — immediate feel
 
         const panner = ctx.createStereoPanner();
-        panner.pan.value = (x * 2 - 1) * 0.55;
+        panner.pan.value = (x * 2 - 1) * 0.45;
+
+        const dryGain = ctx.createGain();
+        dryGain.gain.value = 0.62;
 
         osc1.connect(filter);
         osc2.connect(o2g);
         o2g.connect(filter);
         filter.connect(env);
         env.connect(panner);
-        panner.connect(compressor);
+        panner.connect(dryGain);
+        dryGain.connect(limiter);
+        panner.connect(reverb);
 
         osc1.start(now);
         osc2.start(now);
 
-        voices.set(id, { osc1, osc2, o2g, filter, env, panner });
+        voices.set(id, { osc1, osc2, o2g, filter, env, panner, dryGain });
       }
 
-      function update(id, x, y, speed) {
+      function update(id, x, y, spd) {
         const v = voices.get(id);
         if (!v || !ctx) return;
         const now  = ctx.currentTime;
         const freq = _freq(x);
-        v.osc1.frequency.setTargetAtTime(freq,          now, 0.04);
-        v.osc2.frequency.setTargetAtTime(freq * 2.006,  now, 0.04);
-        v.filter.frequency.setTargetAtTime(_cutoff(y, speed), now, 0.06);
-        // Velocity swells the gain — louder + airier when dragging fast
-        v.env.gain.setTargetAtTime(0.06 + Math.min(speed * 2.5, 0.12), now, 0.03);
-        v.panner.pan.setTargetAtTime((x * 2 - 1) * 0.55, now, 0.08);
+        v.osc1.frequency.setTargetAtTime(freq,               now, 0.04);
+        v.osc2.frequency.setTargetAtTime(freq * 0.501,       now, 0.04);
+        v.filter.frequency.setTargetAtTime(_cutoff(y, spd),  now, 0.06);
+        v.filter.Q.setTargetAtTime(_Q(spd),                  now, 0.05);
+        v.env.gain.setTargetAtTime(0.08 + Math.min(spd * 2.2, 0.11), now, 0.04);
+        v.panner.pan.setTargetAtTime((x * 2 - 1) * 0.45,    now, 0.08);
       }
 
       function stop(id) {
         const v = voices.get(id);
         if (!v || !ctx) return;
+        // Cancel any in-flight ramps and ramp gain to zero before cleanup.
         const now = ctx.currentTime;
         v.env.gain.cancelScheduledValues(now);
-        v.env.gain.setTargetAtTime(0, now, 0.07); // ~350 ms to silence
-        setTimeout(() => {
-          try { v.osc1.stop(); v.osc2.stop(); } catch (_) {}
-          [v.osc1, v.osc2, v.o2g, v.filter, v.env, v.panner].forEach(n => {
-            try { n.disconnect(); } catch (_) {}
-          });
-          voices.delete(id);
-        }, 450);
+        v.env.gain.setTargetAtTime(0, now, 0.025); // ~80ms to silence
+        // Schedule cleanup after the gain has decayed far enough to be inaudible.
+        // Reverb tail continues through the shared node after the voice is gone.
+        const timer = setTimeout(() => {
+          _destroyVoice(id);
+          cleanupTimers.delete(id);
+        }, 160);
+        cleanupTimers.set(id, timer);
       }
 
       function setEnabled(on) {
         enabled = on;
         sessionStorage.setItem('soundEnabled', on ? 'true' : 'false');
-        if (masterOut && ctx) {
-          masterOut.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, 0.12);
-        }
+        if (masterOut && ctx)
+          masterOut.gain.setTargetAtTime(on ? 0.82 : 0, ctx.currentTime, 0.14);
         if (!on) voices.forEach((_, id) => stop(id));
       }
 
