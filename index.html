@@ -11,7 +11,7 @@
   <meta property="og:url"         content="https://casagrande.design/">
   <meta property="og:title"       content="CASAGRANDE">
   <meta property="og:description" content="Designing experiences, products and services. Working between people and technology.">
-  <meta property="og:image"       content="https://casagrande.design/og-preview.png?v=1">
+  <meta property="og:image"       content="https://casagrande.design/og-preview.png?v=2">
   <meta property="og:image:type"  content="image/png">
   <meta property="og:image:width" content="1916">
   <meta property="og:image:height" content="1316">
@@ -20,7 +20,7 @@
   <meta name="twitter:card"        content="summary_large_image">
   <meta name="twitter:title"       content="CASAGRANDE">
   <meta name="twitter:description" content="Designing experiences, products and services. Working between people and technology.">
-  <meta name="twitter:image"       content="https://casagrande.design/og-preview.png?v=1">
+  <meta name="twitter:image"       content="https://casagrande.design/og-preview.png?v=2">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -667,6 +667,11 @@
           ctx = new (window.AudioContext || window.webkitAudioContext)();
         } catch (_) { enabled = false; return; }
 
+        // Resume immediately — must happen synchronously while still inside
+        // the user gesture, before any CPU-heavy work (IR build, node creation).
+        // iOS Safari invalidates the gesture context after ~100ms of sync work.
+        ctx.resume().catch(() => {});
+
         reverb = ctx.createConvolver();
         reverb.buffer = _makeIR();
 
@@ -797,6 +802,13 @@
       function setEnabled(on) {
         enabled = on;
         sessionStorage.setItem('soundEnabled', on ? 'true' : 'false');
+        if (on) {
+          // Boot and resume inside this click gesture — handles the case where
+          // the user previously muted and the AudioContext was never created,
+          // or was auto-suspended by the browser during silence.
+          _boot();
+          if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+        }
         if (masterOut && ctx)
           masterOut.gain.setTargetAtTime(on ? 0.82 : 0, ctx.currentTime, 0.14);
         if (!on) voices.forEach((_, id) => stop(id));
@@ -804,8 +816,36 @@
 
       function isEnabled() { return enabled; }
 
-      return { start, update, stop, setEnabled, isEnabled };
+      // Lightweight unlock: boot the context and resume it inside a gesture.
+      // Does not create voices — used by the mobile first-touch handler.
+      function unlock() {
+        _boot();
+        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      }
+
+      return { start, update, stop, setEnabled, isEnabled, unlock };
     })();
+
+    /* ── Mobile: auto-unlock audio on first touch ────────────────────────
+       On touch devices, AudioContext cannot be created or resumed without a
+       user gesture. We use a one-time capture-phase listener so that the very
+       first touch anywhere on the page (canvas or UI) unlocks the context
+       synchronously, before the existing pointerdown voice-start handler runs.
+       Desktop keeps its existing flow — pointerdown → start() — unchanged.  ── */
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      let _audioUnlocked = false;
+      const _onFirstTouch = () => {
+        if (_audioUnlocked) return;
+        _audioUnlocked = true;
+        document.removeEventListener('touchstart',  _onFirstTouch, true);
+        document.removeEventListener('pointerdown', _onFirstTouch, true);
+        if (SoundEngine.isEnabled()) SoundEngine.unlock();
+      };
+      // touchstart fires before pointerdown on iOS — both registered so either
+      // alone is sufficient; the guard prevents double-execution.
+      document.addEventListener('touchstart',  _onFirstTouch, { passive: true, capture: true });
+      document.addEventListener('pointerdown', _onFirstTouch, { passive: true, capture: true });
+    }
 
     /* ── Wire sound to canvas pointer interactions ─────────────────────── */
     {
