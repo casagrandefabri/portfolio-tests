@@ -523,6 +523,33 @@
       var realValue  = '';
       var busy       = false;
 
+      /* SHA-256 of the correct password — same value as PW_HASH in server.py.
+         Auth runs client-side so it works on static hosting (GitHub Pages).
+         The server-side /auth/login endpoint remains functional for localhost. */
+      var PW_HASH  = '1fa04f119f782c1e40a5f476298b3a0c53c94416a564aa2f6978a3eee5f62756';
+      var LS_KEY   = 'pg_auth_exp';
+      var LS_TTL   = 7 * 24 * 60 * 60 * 1000; /* 7 days, matches server SESSION_DAYS */
+
+      function isLocallyAuthed() {
+        try {
+          var exp = localStorage.getItem(LS_KEY);
+          return !!exp && parseInt(exp, 10) > Date.now();
+        } catch (err) { return false; }
+      }
+
+      function storeLocalAuth() {
+        try { localStorage.setItem(LS_KEY, String(Date.now() + LS_TTL)); } catch (err) {}
+      }
+
+      function hashPassword(pw) {
+        var encoded = new TextEncoder().encode(pw);
+        return crypto.subtle.digest('SHA-256', encoded).then(function (buf) {
+          return Array.from(new Uint8Array(buf))
+            .map(function (b) { return b.toString(16).padStart(2, '0'); })
+            .join('');
+        });
+      }
+
       function showPwRow() {
         realValue = '';
         pwInput.value = '';
@@ -558,11 +585,16 @@
         }, 500);
       }
 
-      /* Auto-reveal if session cookie already authenticated */
-      fetch('/auth/check', { credentials: 'same-origin' })
-        .then(function (r) { return r.json(); })
-        .then(function (d) { if (d.authenticated) unlock(false); })
-        .catch(function () {});
+      /* Auto-reveal: check localStorage first, then try the server cookie
+         (server check silently no-ops on static hosting). */
+      if (isLocallyAuthed()) {
+        unlock(false);
+      } else {
+        fetch('/auth/check', { credentials: 'same-origin' })
+          .then(function (r) { return r.json(); })
+          .then(function (d) { if (d.authenticated) unlock(false); })
+          .catch(function () {});
+      }
 
       seemoreRow.addEventListener('click', showPwRow);
       seemoreRow.addEventListener('keydown', function (e) {
@@ -602,20 +634,14 @@
         if (e.key !== 'Enter' || busy || !realValue.trim()) return;
         busy = true;
         pwInput.disabled = true;
-        fetch('/auth/login', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: realValue })
-        })
-        .then(function (r) {
-          return r.json().then(function (d) { return { ok: r.ok, data: d }; });
-        })
-        .then(function (res) {
-          if (res.ok) { unlock(true); }
-          else        { showError(); }
-        })
-        .catch(function () { showError(); });
+        hashPassword(realValue).then(function (hex) {
+          if (hex === PW_HASH) {
+            storeLocalAuth();
+            unlock(true);
+          } else {
+            showError();
+          }
+        }).catch(function () { showError(); });
       });
     })();
   </script>
