@@ -39,73 +39,21 @@
     /* ── MetaPatient accent ── */
     :root { --accent: #5350ff; }
 
-    /* ── Centered hero layout (NL) ── */
-    .hero-center-block {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(841px, calc(100% - 80px));
-      z-index: 4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      text-align: center;
-      pointer-events: none;
-    }
-    .hero-center-title {
-      font-family: var(--mono);
-      font-size: clamp(13px, 1.23vw, 21px);
-      font-weight: 400;
-      line-height: normal;
-      letter-spacing: 1.05px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-    }
-    .hero-center-logo-group {
-      position: relative;
-      width: 423px;
-      max-width: calc(100% - 40px);
-      height: 90px;
-      margin-bottom: 28px;
-    }
-    .hero-logo-svg-a {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      object-fit: contain;
-      object-position: left center;
-    }
-    .hero-logo-svg-b {
-      position: absolute;
-      right: 0; top: 0;
-      width: 30%; height: 100%;
-      object-fit: contain;
-      object-position: right center;
-    }
-    #hero-expand-btn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      right: auto;
-      bottom: 40px;
-    }
+    /* ── Hero logo sizing ── */
+    .hero-center-logo { width: min(432px, 80vw); margin-bottom: 35px; }
 
     /* Override ring stroke color to accent */
     .scene-ring-fill { stroke: #5350ff; }
 
     /* ── Hero overlay — MetaPatient gradient ── */
     .hero-overlay {
-      background: linear-gradient(to top, #000 9.867%, rgba(36,35,115,0.65) 87.236%);
+      background: linear-gradient(to top, #000 9.24%, rgba(36,35,115,0.65) 87.236%);
     }
 
-    /* ── Hero bg positioning for MetaPatient hero.jpg ── */
+    /* ── Hero bg positioning for MetaPatient hero ── */
     .hero-bg-wrap {
-      left: 0; top: -100px;
-      width: 100%; height: calc(100% + 200px);
-    }
-    .hero-bg-img {
-      object-position: center 20%;
+      left: 0; top: -165px;
+      width: 100%; height: calc(100% + 291px);
     }
 
     /* ── Scene: full-cover image utility ── */
@@ -170,111 +118,29 @@
       .s-grid-two { grid-template-columns: 1fr; }
       .s-grid-two > div:last-child { display: none; }
     }
+    @media (max-width: 600px) {
+      .hero-center-logo { width: min(220px, 60vw); margin-bottom: 0; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .hero-bg-wrap, .scene-bg-wrap { will-change: auto; }
     }
 
     .scene-bg-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* Scene 4 — laptop mockup */
-    .s-laptop-bg {
-      position: absolute; inset: 0;
-      overflow: hidden;
-    }
-    .s-laptop-bg img {
-      position: absolute;
-      left: calc(50% + 144px - 1363px); top: -271px;
-      width: 2726px; height: 3143px;
-      max-width: none;
-      filter: blur(150px);
-      pointer-events: none;
-    }
-    .s-laptop-label {
-      position: absolute;
-      left: 40px; top: 36px;
-      z-index: 3;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: rgba(255,255,255,0.45);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .s-laptop-wrap {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(1298px, 95%);
-      aspect-ratio: 1298.333 / 766.53;
-      z-index: 2;
-    }
-    .s-laptop-frame {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .s-laptop-screen {
-      position: absolute;
-      left: 24.77%; top: 16.37%;
-      width: 76.65%; height: 80.63%;
-      overflow: hidden;
-      z-index: 1;
-    }
-    .s-laptop-screen img {
-      width: 100%; height: 100%;
-      object-fit: cover;
+
+
+    /* cs-next: metapatient → nexus smart, pink scheme */
+    .cs-next-bg-top-overlay {
+      background: linear-gradient(to top, #000 9.24%, rgba(255,80,173,0.25) 87.236%);
     }
 
-    /* Scene 5 — demo placeholder */
-    .s-demo-bg {
-      position: absolute; inset: 0;
-      background: #c4c4c4;
-    }
-    .s-demo-text {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--mono);
-      font-size: clamp(48px, 6vw, 100px);
-      font-weight: 400;
-      color: #2b2b2b;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      line-height: 1.1;
-      z-index: 2;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    /* cs-next bar and overlay for NEXUS transition */
     #cs-next-bar-fill { background: #ff50ad; }
+    #cs-next .cs-next-bar { background: rgba(255,80,173,0.1); }
   </style>
 </head>
 <body>
 
 <div id="pgtrans" aria-hidden="true"></div>
-
-<!-- ── NEXT project (fixed behind page) ──────────────────── -->
-<div id="cs-next" aria-hidden="true">
-  <div class="cs-next-bg-top">
-    <img src="cs-next-bg.png" alt="" loading="lazy">
-    <div class="cs-next-bg-top-overlay"></div>
-  </div>
-  <div class="cs-next-bg-flip">
-    <img src="cs-next-bg.png" alt="" loading="lazy">
-  </div>
-  <div id="cs-next-overlay" class="cs-next-overlay"></div>
-  <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
-  <div id="cs-next-title" class="cs-next-title">
-    <span class="cs-next-word">NEXT</span>
-    <span class="cs-next-name">NEXUS SMART</span>
-  </div>
-  <div class="cs-next-bar">
-    <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
-  </div>
-</div>
 
 <!-- ── PAGE WRAP ──────────────────────────────────────────── -->
 <div id="page-wrap">
@@ -302,28 +168,26 @@
   <div class="hero" id="hero">
     <div class="hero-bg">
       <div class="hero-bg-wrap" data-parallax>
-        <img class="hero-bg-img" src="hero-nl.jpg" alt="" aria-hidden="true" loading="eager">
+        <img class="hero-bg-img" src="hero-raw5.png" alt="" aria-hidden="true" loading="eager">
       </div>
     </div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
-    <!-- Desktop: centered subtitle -->
     <div class="hero-center-block" aria-hidden="true">
-      <div class="hero-center-logo-group" aria-hidden="true">
-        <img src="hero-logo-a.svg" alt="" class="hero-logo-svg-a">
-        <img src="hero-logo-b.svg" alt="" class="hero-logo-svg-b">
-      </div>
+      <img src="mp-logo.svg" alt="MetaPatient" class="hero-center-logo" loading="eager">
       <p class="hero-center-title">A patient-centered platform for exploring complex scientific evidence through interactive clinical experiences.</p>
     </div>
-    <button id="hero-expand-btn" class="expand-btn">PROJECT INFO</button>
+    <div class="hero-bottom-nav">
+      <p class="hero-meta-line">Experience Design Lead • 2022–2026 • Healthcare &amp; Life Sciences</p>
+      <button id="hero-expand-btn" class="expand-btn" data-aura>PROJECT INFO</button>
+    </div>
 
     <!-- Mobile column -->
     <div class="hero-mob-col">
       <div class="hero-mob-text">
-        <p class="hero-mob-heading">MetaPatient</p>
-        <p class="hero-mob-body">A patient-centered platform for exploring clinical evidence through interactive experiences.</p>
+        <p class="hero-mob-role">Experience Design Lead • 2022–2026 • Healthcare &amp; Life Sciences</p>
       </div>
-      <button class="hero-mob-btn expand-btn">PROJECT INFO</button>
+      <button class="hero-mob-btn expand-btn" data-aura>PROJECT INFO</button>
     </div>
   </div>
 
@@ -342,18 +206,18 @@
         </div>
         <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-01">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-01">EXPAND INFO</button>
         <div class="scene-info" id="info-01" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">The Gap in Training</h2>
             <p class="scene-info-desc">Clinical training covers knowledge and procedure. It rarely includes repeated practice of the conversations that are hardest — with a patient who is anxious, in pain, or withholding information. Those situations are hard to simulate and hard to learn from without first making mistakes in real ones.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-01">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-01">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -368,18 +232,18 @@
         </div>
         <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-02">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-02">EXPAND INFO</button>
         <div class="scene-info" id="info-02" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Designing for Practice</h2>
             <p class="scene-info-desc">The design problem wasn't realism — it was practice. A realistic avatar creates presence; a chatbot handles completion; neither is built for learning. The question was what an interaction needs to feel like for someone to treat it as genuine practice — not a task to finish.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-02">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-02">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -388,24 +252,26 @@
     <div class="scene" data-scene="2">
       <div class="scene-card">
         <div class="scene-bg">
-          <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="ui-02.jpg" alt="" aria-hidden="true" loading="lazy">
+          <div class="scene-bg-wrap" data-parallax style="left:0;top:0;width:100%;height:120%;">
+            <video class="scene-bg-img" autoplay muted playsinline loop aria-hidden="true">
+              <source src="Elena Intro 01_1080p.mp4" type="video/mp4">
+            </video>
           </div>
         </div>
         <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-03">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-03">EXPAND INFO</button>
         <div class="scene-info" id="info-03" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">The Conversation Interface</h2>
             <p class="scene-info-desc">The interface had to create genuine stakes without punishing mistakes — enough pressure to make the exchange feel real, enough safety to let someone try something and get it wrong. Patient tone, pacing, feedback structure — all of it held that.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-03">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-03">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -413,30 +279,25 @@
     <!-- ══ Scene 4 — Behind the Scenes ══ -->
     <div class="scene" data-scene="3">
       <div class="scene-card">
-        <div class="s-laptop-bg">
-          <img src="scene-04-blur.png" alt="" aria-hidden="true" loading="lazy">
-        </div>
-        <p class="s-laptop-label">[ Simulation Platform ]</p>
-        <div class="s-laptop-wrap">
-          <div class="s-laptop-screen">
-            <img src="scene-04-screen.png" alt="" loading="lazy">
+        <div class="scene-bg">
+          <div class="scene-bg-wrap" data-parallax style="left:0;top:0;width:100%;height:100%;">
+            <img class="s-full-cover" src="img04-figma-flat.png" alt="" aria-hidden="true" loading="lazy">
           </div>
-          <img class="s-laptop-frame" src="scene-04-laptop.png" alt="" loading="lazy">
         </div>
         <div class="scene-tint" style="opacity:0.15;" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-04">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-04">EXPAND INFO</button>
         <div class="scene-info" id="info-04" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Behind the Patient</h2>
             <p class="scene-info-desc">Each simulation is built around a defined clinical profile, emotional state and communication style. The AI reads intent, not just phrasing, and responds the way a real patient would. Sessions are recorded and reviewed. The feedback isn't a score — it's a mirror.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-04">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-04">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -444,21 +305,27 @@
     <!-- ══ Scene 5 — Why It Matters ══ -->
     <div class="scene" data-scene="4">
       <div class="scene-card">
-        <div class="s-demo-bg" aria-hidden="true"></div>
-        <p class="s-demo-text" aria-hidden="true">Demo<br>Interactiva</p>
+        <div class="scene-bg">
+          <div class="scene-bg-wrap" data-parallax style="left:0;top:0;width:100%;height:120%;">
+            <video class="scene-bg-img" autoplay muted playsinline loop aria-hidden="true">
+              <source src="Elena Intro 01_1080p.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-05">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-05">EXPAND INFO</button>
         <div class="scene-info" id="info-05" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">What Users Learn to Do</h2>
             <p class="scene-info-desc">Early in a session, users approach the simulation as a task — extracting information, moving toward a diagnosis. As they progress, something shifts. The patient responds differently depending on the kind of question asked. Users notice. They slow down. They start listening to what the patient reveals rather than extracting what they need.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-05">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-05">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -467,24 +334,26 @@
     <div class="scene" data-scene="5">
       <div class="scene-card">
         <div class="scene-bg">
-          <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="billboard-02.jpg" alt="" aria-hidden="true" loading="lazy">
+          <div class="scene-bg-wrap" data-parallax style="left:0;top:0;width:100%;height:120%;">
+            <video class="scene-bg-img" autoplay muted playsinline loop aria-hidden="true">
+              <source src="Elena Intro 01_1080p.mp4" type="video/mp4">
+            </video>
           </div>
         </div>
         <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-06">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-06">EXPAND INFO</button>
         <div class="scene-info" id="info-06" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">The Result</h2>
             <p class="scene-info-desc">That shift was the design goal. The patient responds to how you engage — not just what you ask. No instruction required.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-06">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-06">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -493,24 +362,26 @@
     <div class="scene" data-scene="6">
       <div class="scene-card">
         <div class="scene-bg">
-          <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="ui-03.jpg" alt="" aria-hidden="true" loading="lazy">
+          <div class="scene-bg-wrap" data-parallax style="left:0;top:0;width:100%;height:120%;">
+            <video class="scene-bg-img" autoplay muted playsinline loop aria-hidden="true">
+              <source src="Elena Intro 01_1080p.mp4" type="video/mp4">
+            </video>
           </div>
         </div>
         <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-07">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-07">EXPAND INFO</button>
         <div class="scene-info" id="info-07" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">The Platform</h2>
             <p class="scene-info-desc">MetaPatient evolved into a reusable platform deployable across training programs, congresses and live clinical experiences — with configurable patient profiles, evidence layers and session analytics built for scale.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-07">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-07">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -521,7 +392,26 @@
 
 </div><!-- /page-wrap -->
 
-<div id="next-spacer" aria-hidden="true"></div>
+<div id="cs-next-scroll" aria-hidden="true">
+  <div id="cs-next">
+    <div class="cs-next-bg-top">
+      <img class="cs-next-bg-img" src="cs-next-bg.png" alt="" loading="lazy">
+      <div class="cs-next-bg-top-overlay"></div>
+    </div>
+    <div class="cs-next-bg-flip">
+      <img src="cs-next-bg.png" alt="" loading="lazy">
+    </div>
+    <div id="cs-next-overlay" class="cs-next-overlay"></div>
+    <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
+    <div id="cs-next-title" class="cs-next-title">
+      <span class="cs-next-word">NEXT</span>
+      <span class="cs-next-name">NEXUS SMART</span>
+    </div>
+    <div class="cs-next-bar">
+      <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Custom cursor -->
 <div id="cursor">

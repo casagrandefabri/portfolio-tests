@@ -40,41 +40,8 @@
     :root { --accent: #FF00C7; }
     .scene-ring-fill { stroke: #FF00C7; }
 
-    /* ── Centered hero layout (NL) ── */
-    .hero-center-block {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(841px, calc(100% - 80px));
-      z-index: 4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      text-align: center;
-      pointer-events: none;
-    }
-    .hero-center-logo {
-      width: min(334px, 60vw);
-      height: auto;
-      margin-bottom: 32px;
-    }
-    .hero-center-sub {
-      font-family: var(--mono);
-      font-size: clamp(11px, 0.76vw, 13px);
-      font-weight: 400;
-      line-height: normal;
-      letter-spacing: 0.65px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-    }
-    #hero-expand-btn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      right: auto;
-      bottom: 40px;
-    }
+    /* ── Hero logo sizing ── */
+    .hero-center-logo { width: min(334px, 60vw); margin-bottom: 35px; }
 
     /* ── Hero overlay — blue-purple (NL) ── */
     .hero-overlay {
@@ -88,8 +55,13 @@
     }
     .hero-bg-img { object-position: center 25%; }
 
-    /* ── cs-next bar color override for PLAIAR ── */
+    /* cs-next: nexus-smart → plaiar, orange scheme */
+    .cs-next-bg-top-overlay {
+      background: linear-gradient(to top, #000 9.24%, rgba(255,162,80,0.25) 87.236%);
+    }
+
     #cs-next-bar-fill { background: #ffa250; }
+    #cs-next .cs-next-bar { background: rgba(255,162,80,0.1); }
 
     /* ── Scene overlay tint ── */
     .scene-tint {
@@ -138,7 +110,7 @@
     .s-vi-wrap {
       position: absolute;
       inset: 0; z-index: 2;
-      background: url('../../nexus/media/bkg.png') center/cover no-repeat;
+      background: url('img05-poster.png') center/cover no-repeat;
       display: flex; align-items: center; justify-content: center;
     }
     .s-vi-inner {
@@ -169,6 +141,9 @@
       .s-dashboard { width: 95vw; }
       .s-vi-inner { width: 95%; }
     }
+    @media (max-width: 600px) {
+      .hero-center-logo { width: min(194px, 50vw); margin-bottom: 0; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .hero-bg-wrap, .scene-bg-wrap { will-change: auto; }
     }
@@ -192,63 +167,33 @@
       pointer-events: none;
       opacity: 0.8;
     }
-    .s-split2-phone {
-      position: absolute;
-      left: 210px; top: 184px;
-      width: 384px; height: 544px;
-      border-radius: 40px;
-      overflow: hidden;
-      box-shadow: 0 14px 54px rgba(0,0,0,0.25);
-    }
-    .s-split2-phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .s-split2-video-placeholder {
+    .s-split2-video-container {
       position: absolute;
       left: 50%; top: 50%;
-      transform: translate(calc(-50% - 44.54px), -50%);
+      transform: translate(-50%, -50%);
       width: 618px; height: 618px;
       border-radius: 50px;
+      overflow: hidden;
       border: 1px solid rgba(255,255,255,0.15);
+    }
+    .s-split2-video-container video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
     }
     @media (max-width: 960px) {
-      .s-split2-phone { left: 20px; top: 100px; width: 220px; height: 310px; border-radius: 24px; }
-      .s-split2-video-placeholder { display: none; }
-    }
-
-    /* Scene 7 — video placeholder */
-    .s-video-placeholder {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: calc(100% - 100px);
-      height: calc(100% - 50px);
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.15);
+      .s-split2-left, .s-split2-right {
+        width: 100%; height: 50%;
+        top: auto; left: 0; right: auto;
+      }
+      .s-split2-left  { top: 0; }
+      .s-split2-right { top: 50%; }
+      .s-split2-video-container { width: 90%; height: auto; aspect-ratio: 1/1; }
     }
   </style>
 </head>
 <body>
 
 <div id="pgtrans" aria-hidden="true"></div>
-
-<!-- ── NEXT project (fixed behind page) ──────────────────── -->
-<div id="cs-next" aria-hidden="true">
-  <div class="cs-next-bg-top">
-    <img src="cs-next-bg.png" alt="" loading="lazy" onerror="this.style.display='none'">
-    <div class="cs-next-bg-top-overlay"></div>
-  </div>
-  <div class="cs-next-bg-flip">
-    <img src="hero-bg.jpg" alt="" loading="lazy">
-  </div>
-  <div id="cs-next-overlay" class="cs-next-overlay"></div>
-  <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
-  <div id="cs-next-title" class="cs-next-title">
-    <span class="cs-next-word">NEXT</span>
-    <span class="cs-next-name">PLAIAR</span>
-  </div>
-  <div class="cs-next-bar">
-    <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
-  </div>
-</div>
 
 <!-- ── PAGE WRAP ──────────────────────────────────────────── -->
 <div id="page-wrap">
@@ -276,25 +221,26 @@
   <div class="hero" id="hero">
     <div class="hero-bg">
       <div class="hero-bg-wrap" data-parallax>
-        <img class="hero-bg-img" src="hero-bg.jpg" alt="" aria-hidden="true" loading="eager">
+        <img class="hero-bg-img" src="hero-bg.png" alt="" aria-hidden="true" loading="eager">
       </div>
     </div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
-    <!-- Desktop: centered layout -->
     <div class="hero-center-block" aria-hidden="true">
       <img class="hero-center-logo" src="hero-logo.png" alt="Nexus Smart" loading="eager">
-      <p class="hero-center-sub">Operational control software for BRT transit stations — designed around how operators work, not what the system shows.</p>
+      <p class="hero-center-title">Operational control software for BRT transit stations — designed around how operators work, not what the system shows.</p>
     </div>
-    <button id="hero-expand-btn" class="expand-btn">PROJECT INFO</button>
+    <div class="hero-bottom-nav">
+      <p class="hero-meta-line">Lead Designer &amp; Consultant • Mobility &amp; Public Transport</p>
+      <button id="hero-expand-btn" class="expand-btn" data-aura>PROJECT INFO</button>
+    </div>
 
     <!-- Mobile column -->
     <div class="hero-mob-col">
       <div class="hero-mob-text">
-        <p class="hero-mob-heading">Nexus Smart</p>
-        <p class="hero-mob-body">Operational software for BRT stations — designed around what operators need to act fast.</p>
+        <p class="hero-mob-role">Lead Designer &amp; Consultant • Mobility &amp; Public Transport</p>
       </div>
-      <button class="hero-mob-btn expand-btn">PROJECT INFO</button>
+      <button class="hero-mob-btn expand-btn" data-aura>PROJECT INFO</button>
     </div>
   </div>
 
@@ -306,23 +252,22 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="img01-bg.jpg" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img01-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
-        <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-01">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-01">EXPAND INFO</button>
         <div class="scene-info" id="info-01" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Overview</h2>
             <p class="scene-info-desc">Bus terminals are complex environments. Vehicles arrive late. Platforms change. Schedules shift. Thousands of people move through the same physical space every day. Behind it all is a control layer most passengers never see. When it works, the system disappears. When it fails, everyone knows.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-01">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-01">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -332,27 +277,33 @@
       <div class="scene-card">
         <div class="s-split2-left">
           <img class="s-split2-blur-l" src="img02-blur-l.png" alt="" aria-hidden="true" loading="lazy">
-          <div class="s-split2-phone">
-            <img src="img02-phone.png" alt="" loading="lazy">
+          <div class="s-split2-video-container" aria-hidden="true">
+            <video autoplay muted loop playsinline>
+              <source src="../../nexus/media/video01 - SUMA.mov" type="video/mp4">
+            </video>
           </div>
         </div>
         <div class="s-split2-right">
           <img class="s-split2-blur-r" src="img02-blur-r.png" alt="" aria-hidden="true" loading="lazy">
-          <div class="s-split2-video-placeholder" aria-hidden="true"></div>
+          <div class="s-split2-video-container" aria-hidden="true">
+            <video autoplay muted loop playsinline>
+              <source src="../../nexus/media/video02 - SUMA.mov" type="video/mp4">
+            </video>
+          </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-02">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-02">EXPAND INFO</button>
         <div class="scene-info" id="info-02" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Research in Bogotá</h2>
             <p class="scene-info-desc">Before designing anything, I spent time in TransMilenio terminals watching operators work. They split attention constantly between the screen and the station floor. The information they needed was spread across systems and lagged behind what was actually happening. By the time data appeared on-screen, the window to act had often closed. The problem wasn't more information — it was timing and hierarchy.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-02">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-02">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -362,23 +313,22 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="img03-ui.jpg" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img03-ui.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
-        <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-03">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-03">EXPAND INFO</button>
         <div class="scene-info" id="info-03" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Door Control Interface</h2>
             <p class="scene-info-desc">A dashboard shows data. This had to drive action. Every second an operator spends interpreting a screen is a second not spent on the station floor. The interface was designed to reduce that cost: the right information visible by default, with clear paths to what to do next — nothing to parse.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-03">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-03">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -388,23 +338,22 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="img04-bg.jpg" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img04-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
-        <div class="scene-tint" aria-hidden="true"></div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-04">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-04">EXPAND INFO</button>
         <div class="scene-info" id="info-04" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Operational Routines</h2>
             <p class="scene-info-desc">Every workflow was built around one constraint: visibility has to earn its place. The state model for each gate — open, closed, manual, error, anti-panic, no network, emergency — was designed so an operator could read the situation in a glance and act. What showed by default and what required a deliberate action was the most important call in the system.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-04">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-04">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -414,22 +363,24 @@
       <div class="scene-card">
         <div class="s-vi-wrap">
           <div class="s-vi-inner">
-            <video class="s-vi-video" src="../../nexus/media/video-interacciones.mov" muted playsinline preload="auto"></video>
+            <video class="s-vi-video" muted playsinline preload="auto">
+              <source src="../../nexus/media/video-interacciones.mov" type="video/mp4">
+            </video>
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-05">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-05">EXPAND INFO</button>
         <div class="scene-info" id="info-05" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Interactions in Motion</h2>
             <p class="scene-info-desc">A well-designed operational system disappears into the work. That was the target. If the interface needed to explain itself, it had failed. If an operator could act without thinking about it, it had succeeded.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-05">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-05">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -439,23 +390,25 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:0;top:-60px;width:100%;height:130%;">
-            <img class="scene-bg-img" src="img06-bg.jpg" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img06-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
-        <div class="scene-tint" style="background:linear-gradient(to top,#0e0101 9.24%,rgba(59,0,0,0.65) 87.236%);" aria-hidden="true"></div>
+        <div style="position:absolute;left:-135px;top:-53px;width:1900px;height:1018px;pointer-events:none;z-index:1;" aria-hidden="true">
+          <img src="img06-fg.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;max-width:none;" loading="lazy">
+        </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-06">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-06">EXPAND INFO</button>
         <div class="scene-info" id="info-06" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">In the Field</h2>
             <p class="scene-info-desc">TransMilenio terminals are high-throughput environments. Design decisions that look reasonable on a screen behave very differently when an operator is managing several thousand commuters across a peak shift. Field observation shaped everything.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-06">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-06">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -463,20 +416,24 @@
     <!-- ══ Scene 7 — Outcome ══ -->
     <div class="scene" data-scene="6">
       <div class="scene-card">
-        <div class="s-video-placeholder" aria-hidden="true"></div>
+        <div class="s-video-wrap" aria-hidden="true">
+          <video autoplay muted loop playsinline>
+            <source src="../../nexus/media/video03 - SUMA.mov" type="video/mp4">
+          </video>
+        </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-07">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-07">EXPAND INFO</button>
         <div class="scene-info" id="info-07" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">What It Delivers</h2>
             <p class="scene-info-desc">A system operators can read in a glance and act on without interpretation. The interface mirrors the station itself — what's exceptional surfaces immediately, what's routine stays out of the way. Repetitive work is handled through routines. Emergencies have one-step overrides.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-07">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-07">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -487,7 +444,26 @@
 
 </div><!-- /page-wrap -->
 
-<div id="next-spacer" aria-hidden="true"></div>
+<div id="cs-next-scroll" aria-hidden="true">
+  <div id="cs-next">
+    <div class="cs-next-bg-top">
+      <img class="cs-next-bg-img" src="cs-next-bg.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      <div class="cs-next-bg-top-overlay"></div>
+    </div>
+    <div class="cs-next-bg-flip">
+      <img src="cs-next-bg.png" alt="" loading="lazy">
+    </div>
+    <div id="cs-next-overlay" class="cs-next-overlay"></div>
+    <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
+    <div id="cs-next-title" class="cs-next-title">
+      <span class="cs-next-word">NEXT</span>
+      <span class="cs-next-name">PLAIAR</span>
+    </div>
+    <div class="cs-next-bar">
+      <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Custom cursor -->
 <div id="cursor">

@@ -36,53 +36,20 @@
     button { border: none; background: none; font: inherit; color: inherit; cursor: none; }
     ul { list-style: none; }
 
-    /* ── plaiAR accent override ── */
+    /* ── plaiAR accent ── */
     :root { --accent: #FFA250; }
 
-    /* ── Centered hero layout (NL) ── */
-    .hero-center-block {
-      position: absolute;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(841px, calc(100% - 80px));
-      z-index: 4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      text-align: center;
-      pointer-events: none;
+    /* ── Hero logo sizing ── */
+    .hero-center-logo { width: min(312px, 60vw); margin-bottom: 35px; }
+    @media (max-width: 600px) {
+      .hero-center-logo { width: min(194px, 50vw); margin-bottom: 0; }
     }
-    .hero-center-logo {
-      width: min(321px, 60vw);
-      height: auto;
-      margin-bottom: 30px;
+    /* ── next-case: plaiar-specific purple overlay ── */
+    .cs-next-bg-top-overlay {
+      background: linear-gradient(to top, #000 9.24%, rgba(36,35,115,0.65) 87.236%);
     }
-    .hero-center-title {
-      font-family: var(--mono);
-      font-size: clamp(13px, 1.23vw, 21px);
-      font-weight: 400;
-      line-height: normal;
-      letter-spacing: 1.05px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-      margin-bottom: 16px;
-    }
-    .hero-center-sub {
-      font-family: var(--mono);
-      font-size: clamp(11px, 0.76vw, 13px);
-      font-weight: 400;
-      line-height: normal;
-      letter-spacing: 0.65px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.6);
-    }
-    #hero-expand-btn {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      right: auto;
-      bottom: 40px;
+    #cs-next .cs-next-label {
+      top: clamp(28px, 47svh, 480px);
     }
 
     /* img01 — center logo */
@@ -155,19 +122,17 @@
       left: 23.19%;
       top: -18.09%;
       width: 25.15%;
-      height: 90.35%;
-      will-change: transform;
+      height: 100%;
     }
     .s-phone-b {
       position: absolute;
       left: 51.66%;
       top: 24.23%;
       width: 25.15%;
-      height: 90.35%;
-      will-change: transform;
+      height: 100%;
     }
     .s-phone-a img, .s-phone-b img {
-      width: 100%; height: 100%; object-fit: contain; display: block;
+      display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none;
     }
 
     /* img04 — split layout */
@@ -229,7 +194,6 @@
       transform: translateX(-50%);
       width: 412px;
       height: 710px;
-      box-shadow: 0px 7px 60px 0px rgba(0,0,0,0.45);
       overflow: hidden;
       z-index: 2;
     }
@@ -352,26 +316,6 @@
 
 <div id="pgtrans" aria-hidden="true"></div>
 
-<!-- ── NEXT project (fixed behind page) ──────────────────── -->
-<div id="cs-next" aria-hidden="true">
-  <div class="cs-next-bg-top">
-    <img src="cs-next-bg-top.png" alt="" loading="lazy">
-    <div class="cs-next-bg-top-overlay"></div>
-  </div>
-  <div class="cs-next-bg-flip">
-    <img src="cs-next-bg.png" alt="" loading="lazy">
-  </div>
-  <div id="cs-next-overlay" class="cs-next-overlay"></div>
-  <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
-  <div id="cs-next-title" class="cs-next-title">
-    <span class="cs-next-word">NEXT</span>
-    <span class="cs-next-name">METAPATIENT</span>
-  </div>
-  <div class="cs-next-bar">
-    <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
-  </div>
-</div>
-
 <!-- ── PAGE WRAP ──────────────────────────────────────────── -->
 <div id="page-wrap">
 
@@ -398,27 +342,27 @@
   <div class="hero" id="hero">
     <div class="hero-bg">
       <div class="hero-bg-wrap" data-parallax>
-        <img class="hero-bg-img" src="scene-arena.png" alt="" aria-hidden="true" loading="eager">
+        <img class="hero-bg-img" src="hero-bg.png" alt="" aria-hidden="true" loading="eager">
       </div>
     </div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
-    <!-- Desktop: centered logo + subtitle -->
+    <!-- Desktop: centered logo + tagline -->
     <div class="hero-center-block" aria-hidden="true">
       <img class="hero-center-logo" src="hero-logo.png" alt="plaiAR" loading="eager">
-      <p class="hero-center-title">a WebAR gaming platform designed to turn live audiences into active participants through short mobile experiences during sports events.</p>
-      <p class="hero-center-sub">The first version was designed, built and tested during a live basketball game in Uruguay, allowing fans to join an interactive experience directly from their phones.</p>
+      <p class="hero-center-title">A WebAR gaming platform designed to turn live audiences into active participants through short mobile experiences during sports events.</p>
     </div>
-    <button id="hero-expand-btn" class="expand-btn">PROJECT INFO</button>
+    <div class="hero-bottom-nav">
+      <p class="hero-meta-line">Co-founder &amp; Product Designer • 2024 • Sports &amp; Entertainment</p>
+      <button id="hero-expand-btn" class="expand-btn" data-aura>PROJECT INFO</button>
+    </div>
 
-    <!-- Mobile: flex column (hidden on desktop) -->
+    <!-- Mobile: bottom-anchored logo + description + button -->
     <div class="hero-mob-col">
       <div class="hero-mob-text">
-        <p class="hero-mob-heading">Turning live audiences into active participants through augmented reality.</p>
-        <p class="hero-mob-body">A WebAR gaming platform for live sports. Scan the QR code — no download required.</p>
-        <p class="hero-mob-body">First tested live at a Club Welcome basketball game in Uruguay.</p>
+        <p class="hero-mob-role">Co-founder &amp; Product Designer • 2024 • Sports &amp; Entertainment</p>
       </div>
-      <button class="hero-mob-btn expand-btn">PROJECT INFO</button>
+      <button class="hero-mob-btn expand-btn" data-aura>PROJECT INFO</button>
     </div>
   </div>
 
@@ -430,29 +374,29 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:-43px;top:-185px;width:1716px;height:1283px;">
-            <img class="scene-bg-img" src="scene-01-bg.png" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img01-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
         <div class="scene-content">
           <div class="s-logo-wrap" aria-hidden="true">
             <img class="s-logo-ring" src="scene-01-ring.svg" alt="">
-            <img class="s-logo-img" src="scene-01-logo.png" alt="">
+            <img class="s-logo-img" src="img01-logo.png" alt="">
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-0.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-01">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-01">EXPAND INFO</button>
         <div class="scene-info" id="info-01" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">From Funding to a Real Pilot</h2>
             <p class="scene-info-desc">ANII and ANDE backed both the MVP and its dissemination. That funded a real test — not a demo, but a live basketball game at Club Welcome, with a crowd that had other things to pay attention to.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-01">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-01">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -462,13 +406,13 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:-40px;top:-182px;width:1710px;height:1277px;">
-            <img class="scene-bg-img" src="scene-02-bg.png" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img02-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
         <div class="s-gameplay-wrap" data-parallax>
           <div class="s-gameplay-clip">
             <div class="s-gameplay-bg">
-              <img src="scene-02-gameplay.png" alt="" loading="lazy">
+              <img src="img02-gameplay-device.png" alt="" loading="lazy">
             </div>
           </div>
           <div class="s-gameplay-phone" aria-hidden="true">
@@ -480,19 +424,19 @@
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-1.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-02">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-02">EXPAND INFO</button>
         <div class="scene-info" id="info-02" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Building the Core Experience</h2>
             <p class="scene-info-desc">The MVP ran directly in the phone browser — no app, no installation. A QR code at the venue was the only entry point. The camera turned the court into the game environment, and the challenge had to be understood before the next play started: a fan in the middle of a game won't stop to read instructions.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-02">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-02">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -502,31 +446,31 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:-23.5px;top:-11.5px;width:1677px;height:936px;">
-            <img class="scene-bg-img" src="scene-03-bg.png" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img03-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
         <div class="scene-content">
           <div class="s-phone-a">
-            <img src="phone-1.png" alt="" loading="lazy">
+            <img src="img03-phone-left.png" alt="" loading="lazy">
           </div>
           <div class="s-phone-b">
-            <img src="phone-2.png" alt="" loading="lazy">
+            <img src="img03-phone-right.png" alt="" loading="lazy">
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-1.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-03">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-03">EXPAND INFO</button>
         <div class="scene-info" id="info-03" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Turning a Game into a Product</h2>
             <p class="scene-info-desc">One event is a demo. We built a configuration layer around the core game — branding, scoring, rankings, rewards — so the same mechanics could run for any club or sponsor without rebuilding.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-03">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-03">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -536,29 +480,29 @@
       <div class="scene-card">
         <div class="s-split-right">
           <div class="s-split-right-bg" data-parallax>
-            <img src="scene-04-bg.png" alt="" aria-hidden="true" loading="lazy">
+            <img src="img04-bg-right.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
         <div class="s-split-left">
-          <img class="s-split-glow" src="scene-04-glow.png" alt="" aria-hidden="true" loading="lazy">
+          <img class="s-split-glow" src="img04-bg-left.png" alt="" aria-hidden="true" loading="lazy">
           <div class="s-split-card">
-            <img src="figma-image32.png" alt="" loading="lazy">
+            <img src="img04-phone.png" alt="" loading="lazy">
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-2.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-04">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-04">EXPAND INFO</button>
         <div class="scene-info" id="info-04" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Creating Value for Sponsors</h2>
             <p class="scene-info-desc">Fans who played could unlock branded rewards from sponsors. That gave sponsors an active interaction during the event — not just a logo on a banner.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-04">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-04">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -567,25 +511,25 @@
     <div class="scene" data-scene="4">
       <div class="scene-card">
         <div class="s-fans-wrap" data-parallax>
-          <img class="s-fans-img" src="tech-fans.png" alt="" aria-hidden="true" loading="lazy">
+          <img class="s-fans-img" src="img05-bg.png" alt="" aria-hidden="true" loading="lazy">
         </div>
         <div class="s-fans-phone" aria-hidden="true">
-          <img src="scene-05-phone.png" alt="" loading="lazy">
+          <img src="img05-phone.png" alt="" loading="lazy">
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-3.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-05">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-05">EXPAND INFO</button>
         <div class="scene-info" id="info-05" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Testing with a Real Audience</h2>
             <p class="scene-info-desc">The launch at Club Welcome revealed what lab testing couldn't. Fans in the stands have limited attention and no patience for a slow entry. Device variety was real. Venue connectivity was inconsistent. Every friction point that didn't matter in a prototype mattered in front of a crowd with somewhere else to look.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-05">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-05">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -595,28 +539,28 @@
       <div class="scene-card">
         <div class="scene-bg">
           <div class="scene-bg-wrap" data-parallax style="left:-20px;top:-76px;width:1670px;height:1064px;">
-            <img class="scene-bg-img" src="scene-06-bg.png" alt="" aria-hidden="true" loading="lazy">
+            <img class="scene-bg-img" src="img06-bg.png" alt="" aria-hidden="true" loading="lazy">
           </div>
         </div>
         <div class="scene-content">
           <div class="s-center-phone">
-            <img src="scene-06-phone.png" alt="" loading="lazy">
+            <img src="img06-phone.png" alt="" loading="lazy">
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-4.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-06">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-06">EXPAND INFO</button>
         <div class="scene-info" id="info-06" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">Reducing the Barrier to Play</h2>
             <p class="scene-info-desc">Entry had to feel like part of the event — not a separate decision. QR codes placed around the venue opened the experience directly in the browser: no download, no account, no steps between scanning and playing.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-06">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-06">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -629,26 +573,26 @@
             <div class="s-img07-flip">
               <picture>
                 <source media="(max-width: 600px)" srcset="materials/img07-mobile.png">
-                <img src="scene-07-bg.png" alt="" aria-hidden="true" loading="lazy">
+                <img src="img07-ui.jpg" alt="" aria-hidden="true" loading="lazy">
               </picture>
               <div class="s-img07-gradient" aria-hidden="true"></div>
             </div>
           </div>
         </div>
         <div class="scene-icon" aria-hidden="true">
-          <svg class="scene-ring-svg" viewBox="0 0 31.5 31.5">
-            <path class="scene-ring-fill" d="M13.0518 3.36719C14.5418 1.87719 16.9582 1.87719 18.4482 3.36719L28.1328 13.0518C29.6228 14.5418 29.6228 16.9582 28.1328 18.4482L18.4482 28.1328C16.9582 29.6228 14.5418 29.6228 13.0518 28.1328L3.36719 18.4482C1.87719 16.9582 1.87719 14.5418 3.36719 13.0518L13.0518 3.36719Z"/>
+          <svg class="scene-ring-svg" viewBox="0 0 21 21">
+            <path class="scene-ring-fill" d="M9.39062 3.14355C9.88428 2.2855 11.1157 2.2855 11.6094 3.14355L19.3252 16.5654C19.8208 17.4281 19.199 18.4998 18.2158 18.5H2.78418C1.80103 18.4998 1.17919 17.4281 1.6748 16.5654L9.39062 3.14355Z"/>
           </svg>
           <img class="scene-icon-img" src="icon-5.svg" alt="">
         </div>
-        <button class="expand-btn scene-expand-btn" data-info="info-07">EXPAND INFO</button>
+        <button class="expand-btn scene-expand-btn" data-aura data-info="info-07">EXPAND INFO</button>
         <div class="scene-info" id="info-07" aria-hidden="true">
           <div class="scene-info-blur"></div>
           <div class="scene-info-text">
             <h2 class="scene-info-title">What the Pilot Showed</h2>
             <p class="scene-info-desc">Running the activation made the commercial model clear. A custom experience for one club is a service. A configurable platform that any club or sponsor can deploy across events is a product. plaiAR moved in that direction.</p>
           </div>
-          <button class="expand-btn scene-close-btn" data-info="info-07">CLOSE INFO</button>
+          <button class="expand-btn scene-close-btn" data-aura data-info="info-07">CLOSE INFO</button>
         </div>
       </div>
     </div>
@@ -660,8 +604,26 @@
 
 </div><!-- /page-wrap -->
 
-<!-- Spacer: cs-next revealed as page-wrap scrolls off -->
-<div id="next-spacer" aria-hidden="true"></div>
+<div id="cs-next-scroll" aria-hidden="true">
+  <div id="cs-next">
+    <div class="cs-next-bg-top">
+      <img class="cs-next-bg-img" src="cs-next-bg-top.png" alt="" loading="lazy">
+      <div class="cs-next-bg-top-overlay"></div>
+    </div>
+    <div class="cs-next-bg-flip">
+      <img src="cs-next-bg.png" alt="" loading="lazy">
+    </div>
+    <div id="cs-next-overlay" class="cs-next-overlay"></div>
+    <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
+    <div id="cs-next-title" class="cs-next-title">
+      <span class="cs-next-word">NEXT</span>
+      <span class="cs-next-name">METAPATIENT</span>
+    </div>
+    <div class="cs-next-bar">
+      <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Custom cursor -->
 <div id="cursor">
