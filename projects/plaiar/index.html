@@ -44,13 +44,13 @@
     @media (max-width: 600px) {
       .hero-center-logo { width: min(194px, 50vw); margin-bottom: 0; }
     }
-    /* ── next-case: plaiar-specific purple overlay ── */
+    /* cs-next: plaiar → nexus smart, pink scheme */
     .cs-next-bg-top-overlay {
-      background: linear-gradient(to top, #000 9.24%, rgba(36,35,115,0.65) 87.236%);
+      background: linear-gradient(to top, #000 9.24%, rgba(255,80,173,0.25) 87.236%);
     }
-    #cs-next .cs-next-label {
-      top: clamp(28px, 47svh, 480px);
-    }
+
+    #cs-next-bar-fill { background: #ff50ad; }
+    #cs-next .cs-next-bar { background: rgba(255,80,173,0.1); }
 
     /* img01 — center logo */
     .s-logo-wrap {
@@ -607,17 +607,17 @@
 <div id="cs-next-scroll" aria-hidden="true">
   <div id="cs-next">
     <div class="cs-next-bg-top">
-      <img class="cs-next-bg-img" src="cs-next-bg-top.png" alt="" loading="lazy">
+      <img class="cs-next-bg-img" src="../metapatient/cs-next-bg.png" alt="" loading="lazy">
       <div class="cs-next-bg-top-overlay"></div>
     </div>
     <div class="cs-next-bg-flip">
-      <img src="cs-next-bg.png" alt="" loading="lazy">
+      <img src="../metapatient/cs-next-bg.png" alt="" loading="lazy">
     </div>
     <div id="cs-next-overlay" class="cs-next-overlay"></div>
     <p id="cs-next-label" class="cs-next-label">KEEP SCROLLING TO SEE PROJECT</p>
     <div id="cs-next-title" class="cs-next-title">
       <span class="cs-next-word">NEXT</span>
-      <span class="cs-next-name">METAPATIENT</span>
+      <span class="cs-next-name">NEXUS SMART</span>
     </div>
     <div class="cs-next-bar">
       <div id="cs-next-bar-fill" class="cs-next-bar-fill"></div>
@@ -663,8 +663,8 @@ window.CASE_CONFIG = {
   slug: 'plaiar',
   ringCount: 7,
   nextProject: {
-    name: 'METAPATIENT',
-    path: '/projects/metapatient/',
+    name: 'NEXUS SMART',
+    path: '/projects/nexus-smart/',
     restricted: false
   },
   projectInfo: {
