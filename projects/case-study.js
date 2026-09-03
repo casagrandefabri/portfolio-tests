@@ -94,7 +94,7 @@
   var nextCfg    = CFG.nextProject || {};
   var NEXT_HREF  = nextCfg.path || '';
   var RESTRICTED = nextCfg.restricted === true;
-  var FALLBACK   = '/projects/plaiar';
+  var FALLBACK   = '/projects/plaiar/';
   var nextScroll = document.getElementById('cs-next-scroll');
   var barFill    = document.getElementById('cs-next-bar-fill');
   var labelEl    = document.getElementById('cs-next-label');
@@ -284,6 +284,20 @@
     if (expandBtn) expandBtn.addEventListener('click', open);
     var mobBtn = document.querySelector('.hero-mob-btn');
     if (mobBtn) mobBtn.addEventListener('click', open);
+
+    /* bfcache restore: if the overlay was open when the user navigated away,
+       the scroll-locked class and panel state persist. Reset without animation. */
+    window.addEventListener('pageshow', function (e) {
+      if (!e.persisted) return;
+      isOpen = false;
+      document.documentElement.classList.remove('scroll-locked');
+      if (ov) {
+        ov.classList.remove('is-open');
+        ov.setAttribute('aria-hidden', 'true');
+        if (typeof gsap !== 'undefined') gsap.set(ov, { opacity: 0 });
+        else ov.style.opacity = '0';
+      }
+    });
   })();
 
   /* ── Expand info panels ──────────────────────────────────────── */
@@ -318,5 +332,15 @@
   }).observe(document.documentElement);
   render();
   renderNext();
+
+  /* bfcache restore: navigating flag and navTimer persist from the previous
+     visit, which would prevent scroll-to-next from ever firing again. */
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    navigating = false;
+    if (navTimer) { clearTimeout(navTimer); navTimer = null; }
+    navEnabled = false;
+    setTimeout(function () { navEnabled = true; }, 600);
+  });
 
 })();

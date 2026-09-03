@@ -125,6 +125,28 @@
     }
   }
 
+  /* ── bfcache restore ───────────────────────────────────────────── */
+  /* When the browser restores a page from the back/forward cache it fires
+     pageshow with event.persisted = true.  The page DOM is exactly as it
+     was when the user navigated away — meaning #pgtrans is still opaque
+     and any exit-animated elements still have stale GSAP inline styles.
+     Reset everything immediately so the page is fully visible. */
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    busy = false;
+    if (typeof gsap !== 'undefined') {
+      gsap.killTweensOf(block);
+      /* Project-list rows faded out during the exit stagger */
+      gsap.set('a.p-row--active', { clearProps: 'all' });
+      /* Case-study entrance elements set by this file on arrival */
+      gsap.set(
+        '.cs-hero-img img, .cs-title, .cs-info-col, .cs-divider, .cs-rail-item, .cs-mobile-nav-item',
+        { clearProps: 'all' }
+      );
+    }
+    block_set(0, 'none');
+  });
+
   /* ── Click interception ─────────────────────────────────────────── */
 
   /* Project rows → case study (exit: siblings fold away, overlay sweeps in) */
