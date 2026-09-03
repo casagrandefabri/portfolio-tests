@@ -89,7 +89,7 @@ body { overflow-x: hidden; }
 .header-nav a.active { opacity: 1; }
 
 /* ─── PAGE TOP SPACER ────────────────────────────────────── */
-.page-spacer { height: 64px; }
+.page-spacer { height: var(--nav-h, 111px); }
 
 /* ─── COLUMNS ────────────────────────────────────────────── */
 .col-narrow  { max-width: 660px;  margin: 0 auto; padding: 0 clamp(24px, 5vw, 48px); }

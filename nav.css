@@ -1,0 +1,179 @@
+/* ─── SHARED GLOBAL NAV ──────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'PP Monument Extended';
+  src: url('PPMonumentExtended-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --nav-h:         111px;
+  --nav-h-compact:  81px;
+  --nav-ease:      cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── NAV SHELL ──────────────────────────────────────────────────────────── */
+#g-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  z-index: 100;
+  background: rgba(0,0,0,0.01);
+  backdrop-filter: blur(3.5px);
+  -webkit-backdrop-filter: blur(3.5px);
+  border: 1px solid transparent;
+  border-radius: 0;
+  transition:
+    height            0.5s var(--nav-ease),
+    top               0.5s var(--nav-ease),
+    left              0.5s var(--nav-ease),
+    right             0.5s var(--nav-ease),
+    border-radius     0.5s var(--nav-ease),
+    border-color      0.5s var(--nav-ease),
+    background        0.5s var(--nav-ease),
+    backdrop-filter   0.5s var(--nav-ease),
+    -webkit-backdrop-filter 0.5s var(--nav-ease);
+}
+
+#g-nav.is-compact {
+  height: var(--nav-h-compact);
+  top: 10px;
+  left: 40px;
+  right: 40px;
+  border-radius: 100px;
+  border-color: rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ─── LEFT: BACK BUTTON + BREADCRUMB ─────────────────────────────────────── */
+#g-nav-left {
+  position: absolute;
+  left: 40px;
+  top: 35px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 1;
+  transition: top 0.5s var(--nav-ease);
+}
+#g-nav.is-compact #g-nav-left { top: 19px; }
+
+#g-nav-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; height: 42px;
+  background: linear-gradient(85.9deg, rgba(209,209,255,0.1) 0%, rgba(255,192,226,0.1) 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  --aura-size: 65px;
+  --aura-strength: 0.18;
+}
+#g-nav-back:hover {
+  background: linear-gradient(85.9deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 100%);
+}
+#g-nav-back:focus { outline: none; }
+#g-nav-back:focus-visible { box-shadow: 0 0 0 1px rgba(255,255,255,0.55); }
+
+#g-nav-breadcrumb {
+  font-family: 'Red Hat Mono', ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+/* ─── CENTER: CASAGRANDE LOGO + PROJECT ICONS ────────────────────────────── */
+#g-nav-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 30px;
+  border-radius: 70px;
+  --aura-size: 100px;
+  --aura-strength: 0.12;
+}
+#g-nav-logo:focus { outline: none; }
+#g-nav-logo:focus-visible {
+  outline: 1px solid rgba(255,255,255,0.35);
+  outline-offset: 10px;
+  border-radius: 8px;
+}
+
+.g-nav-icon {
+  width: 21px; height: 21px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* CASAGRANDE wordmark — collapses symmetrically from center outward on scroll */
+#g-nav-wordmark {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 7px 13px;
+  max-width: 300px;
+  clip-path: inset(0 0% 0 0%);
+  transition:
+    clip-path    0.45s var(--nav-ease),
+    max-width    0.45s var(--nav-ease),
+    padding      0.45s var(--nav-ease),
+    margin       0.45s var(--nav-ease);
+}
+
+#g-nav-wordmark-text {
+  font-family: 'PP Monument Extended', sans-serif;
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: 0.54px;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+}
+
+#g-nav.is-compact #g-nav-wordmark {
+  clip-path: inset(0 50% 0 50%);
+  max-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: -5px;
+  margin-right: -5px;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  #g-nav-left { left: 24px; }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --nav-h: 80px;
+    --nav-h-compact: 60px;
+  }
+  #g-nav-left { left: 24px; top: 22px; gap: 10px; }
+  #g-nav.is-compact #g-nav-left { top: 12px; }
+  #g-nav-back { width: 36px; height: 36px; }
+  #g-nav-breadcrumb { display: none; }
+  #g-nav-wordmark-text { font-size: 18px; }
+  .g-nav-icon { width: 16px; height: 16px; }
+}
+
+@media (max-width: 540px) {
+  #g-nav-wordmark { display: none; }
+}
+
+/* ─── REDUCED MOTION ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #g-nav,
+  #g-nav-left,
+  #g-nav-wordmark { transition: none; }
+}

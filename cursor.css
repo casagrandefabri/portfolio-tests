@@ -1,0 +1,59 @@
+/* ─── SHARED CURSOR SYSTEM ──────────────────────────────────────────────── */
+/* Cursor ring */
+#cursor {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9000;
+  display: none;
+}
+#cursor-inner {
+  width: 30px; height: 30px;
+  transform-origin: center center;
+  transition: filter 0.12s ease;
+}
+#cursor-inner svg { display: block; }
+
+@media (hover: hover) and (pointer: fine) {
+  body, a, button { cursor: none; }
+  #cursor { display: block; }
+}
+
+/* Page cursor aura (non-canvas pages) */
+#page-aura {
+  position: fixed; top: 0; left: 0;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform;
+}
+#page-aura-inner {
+  position: absolute;
+  left: -924px; top: -924px;
+  width: 1848px; height: 1848px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.078)  0%,
+    rgba(255,255,255,0.035) 14%,
+    rgba(255,255,255,0.014) 30%,
+    rgba(255,255,255,0.004) 50%,
+    rgba(255,255,255,0.001) 68%,
+    rgba(255,255,255,0)     84%);
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* Button aura */
+[data-aura] { position: relative; isolation: isolate; }
+[data-aura]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  background: radial-gradient(circle var(--aura-size, 90px) at var(--mx, 50%) var(--my, 50%),
+              rgba(255,255,255, var(--aura-strength, 0.16)) 0%, transparent 72%);
+}
+[data-aura].is-aura-active::before { opacity: 1; transition-duration: 150ms; }

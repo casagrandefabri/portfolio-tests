@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Projects — CASAGRANDE</title>
+  <meta name="description" content="Selected work by Fabrizio Casagrande — product design, UX, brand.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../cursor.css">
+  <link rel="stylesheet" href="../nav.css">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    img, svg { display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { background: none; border: none; font: inherit; color: inherit; padding: 0; }
+
+    :root {
+      --mono:      'Red Hat Mono', ui-monospace, monospace;
+      --monument:  'PP Monument Extended', sans-serif;
+      --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+      --bg:        #131417;
+    }
+
+    html, body {
+      min-height: 100%;
+      background:
+        radial-gradient(72% 85% at 82% 42%, rgba(10,7,24,0.98) 0%, rgba(12,8,27,0.96) 34%, rgba(16,10,27,0.8) 54%, transparent 76%),
+        radial-gradient(95% 120% at -8% 48%, rgba(57,23,43,0.38) 0%, rgba(38,17,34,0.22) 42%, transparent 74%),
+        radial-gradient(72% 72% at 56% 110%, rgba(47,18,36,0.34) 0%, transparent 72%),
+        linear-gradient(115deg, #19131d 0%, #160f1a 42%, #12101e 100%);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.045; mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.9'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 220px 220px;
+    }
+
+    /* ─── MAIN ──────────────────────────────────────────── */
+    #p-main {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: stretch; justify-content: center;
+      min-height: 100svh;
+      padding-top: var(--nav-h); padding-bottom: 140px;
+    }
+
+    /* ─── ROW BASE ──────────────────────────────────────── */
+    .p-row {
+      position: relative; width: 100%; height: 89px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 40px; isolation: isolate;
+    }
+    .p-row-inner {
+      width: 1186px; max-width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      gap: 25px; position: relative; z-index: 1;
+    }
+
+    /* ─── NAME TEXT ─────────────────────────────────────── */
+    .p-name {
+      font-family: var(--monument);
+      font-size: clamp(28px, 5vw, 70px);
+      font-weight: 900; text-transform: uppercase;
+      text-align: center; white-space: nowrap;
+      line-height: 1; flex-shrink: 1; min-width: 0;
+    }
+
+    /* ─── ACTIVE ROWS ───────────────────────────────────── */
+    .p-row--active .p-name {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.45);
+      transition: color 0.2s var(--ease), -webkit-text-stroke-color 0.2s var(--ease);
+    }
+    .p-row--active:hover .p-name,
+    .p-row--active:focus-visible .p-name {
+      color: #fff; -webkit-text-stroke-color: transparent;
+    }
+    .p-row--active:focus { outline: none; }
+    .p-row--active:focus-visible {
+      outline: 1px solid rgba(255,255,255,0.15); outline-offset: -2px;
+    }
+
+    .p-hover-icon {
+      width: 58px; height: 58px; object-fit: contain; flex-shrink: 0;
+      opacity: 0; transition: opacity 0.2s var(--ease);
+    }
+    .p-row--active:hover .p-hover-icon,
+    .p-row--active:focus-visible .p-hover-icon { opacity: 1; }
+
+    /* ─── SEE MORE ROW ──────────────────────────────────── */
+    .p-row--seemore {
+      cursor: none; width: 100%;
+    }
+    .p-row--seemore .p-name {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.45);
+      transition: color 0.2s var(--ease), -webkit-text-stroke-color 0.2s var(--ease);
+    }
+    .p-row--seemore:hover .p-name,
+    .p-row--seemore:focus-visible .p-name {
+      color: #fff; -webkit-text-stroke-color: transparent;
+    }
+    .p-row--seemore:focus { outline: none; }
+    .p-row--seemore:focus-visible {
+      outline: 1px solid rgba(255,255,255,0.15); outline-offset: -2px;
+    }
+    .p-row--seemore::after, .p-row--pw::after {
+      content: ''; position: absolute; bottom: 13px;
+      left: 50%; transform: translateX(-50%);
+      width: min(520px, 55%); height: 1px;
+      background: rgba(255,255,255,0.4); pointer-events: none;
+    }
+
+    /* ─── SOON ROW ─────────────────────────────────────── */
+    .p-row--soon { pointer-events: none; }
+    .p-row--soon .p-name {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.45);
+    }
+    .p-soon-pill {
+      flex-shrink: 0;
+      width: 70px; height: 31px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(209,209,240,0.15);
+      border-radius: 12px;
+    }
+    .p-soon-pill span {
+      font-family: var(--mono);
+      font-size: 13px; font-weight: 400;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: -0.5px;
+      white-space: nowrap;
+    }
+    .p-soon-pill--ghost { opacity: 0; }
+
+    /* ─── PASSWORD ROW ──────────────────────────────────── */
+    .p-row--pw { cursor: text; }
+    .p-pw-inner {
+      position: relative; width: 1186px; max-width: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .p-pw-input {
+      background: transparent; border: none; outline: none;
+      font-family: var(--monument);
+      font-size: clamp(28px, 5vw, 70px);
+      font-weight: 900; text-transform: uppercase;
+      text-align: center; color: rgba(255,255,255,0.6);
+      caret-color: rgba(255,255,255,0.7);
+      letter-spacing: 0.12em; width: 100%;
+      cursor: none; line-height: 1;
+    }
+    .p-pw-label {
+      font-family: var(--monument);
+      font-size: clamp(28px, 5vw, 70px);
+      font-weight: 900; text-transform: uppercase;
+      color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.25);
+      white-space: nowrap; pointer-events: none;
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.15s; line-height: 1; user-select: none;
+    }
+    .p-pw-input:focus ~ .p-pw-label,
+    .p-pw-input:not(:placeholder-shown) ~ .p-pw-label { opacity: 0; }
+
+    .p-row--pw.is-error .p-pw-input {
+      color: rgba(255,85,85,0.65);
+      animation: pw-shake 0.42s ease;
+    }
+    @keyframes pw-shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-10px); }
+      55%       { transform: translateX(10px); }
+      80%       { transform: translateX(-5px); }
+    }
+
+
+    /* ─── FOOTER ────────────────────────────────────────── */
+    #p-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      display: flex; flex-direction: column;
+      align-items: center; padding-bottom: 42px; pointer-events: none;
+    }
+    #p-footer-text {
+      font-family: var(--mono); font-size: 16px; letter-spacing: 0.08px;
+      text-transform: uppercase; text-align: center; color: #fff;
+      max-width: 640px; line-height: 1.5; margin-bottom: 24px; padding: 0 24px;
+    }
+    #p-footer-btns { display: flex; gap: 10px; pointer-events: auto; }
+
+    .p-btn {
+      font-family: var(--mono); font-size: 13px; letter-spacing: 0.065px;
+      text-transform: uppercase; color: #fff; text-decoration: none;
+      background: linear-gradient(80deg, rgba(209,209,255,0.1) 0%, rgba(255,192,226,0.1) 100%);
+      border-radius: 12px; padding: 12px 18px; height: 42px;
+      display: flex; align-items: center; gap: 10px;
+      border: none; white-space: nowrap; cursor: none; touch-action: auto;
+      transition: background 0.2s; position: relative; isolation: isolate;
+    }
+    .p-btn:hover {
+      background: linear-gradient(80deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 100%);
+    }
+    .p-btn:focus { outline: none; }
+    .p-btn:focus-visible { box-shadow: 0 0 0 1px rgba(255,255,255,0.55); }
+
+    .contact-btn { gap: 0; }
+    .contact-copy-label {
+      color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden;
+      max-width: 0; padding-left: 0;
+      transition: max-width 0.28s cubic-bezier(0.22,1,0.36,1),
+                  padding-left 0.28s cubic-bezier(0.22,1,0.36,1);
+    }
+    .contact-btn.is-expanded .contact-copy-label { max-width: 130px; padding-left: 10px; }
+    .p-btn--current { opacity: 0.4; pointer-events: none; }
+
+    /* ─── CURSOR AURA ───────────────────────────────────── */
+    @property --aura-color {
+      syntax: '<color>'; initial-value: rgba(55,22,68,0.30); inherits: false;
+    }
+    .cursor-aura {
+      --aura-color: rgba(55,22,68,0.30);
+      will-change: opacity, transform; pointer-events: none; z-index: 1; opacity: 0.5;
+      background: radial-gradient(50% 50% at 50% 50%, var(--aura-color) 0%, transparent 100%);
+      border-radius: 100%; width: 150vmax; height: 150vmax;
+      position: fixed; top: 0; left: 0;
+      transition: --aura-color 0.55s cubic-bezier(0.22,1,0.36,1);
+    }
+    @media (hover: none), (pointer: coarse) { .cursor-aura { display: none; } }
+    @media (prefers-reduced-motion: reduce)  { .cursor-aura { display: none; } }
+
+    /* ─── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width: 960px) { .p-row { padding: 0 24px; } }
+    @media (max-width: 768px) {
+      .p-row { height: 72px; padding: 0 16px; }
+      .p-hover-icon { width: 42px; height: 42px; }
+      #p-footer { padding-bottom: 24px; }
+      #p-footer-text { font-size: 13px; margin-bottom: 16px; }
+    }
+    @media (max-width: 540px) {
+      .p-hover-icon { display: none; }
+      #p-footer-text { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .p-row--active .p-name, .p-row--seemore .p-name, .p-hover-icon { transition: none; }
+      @keyframes pw-shake { 0%, 100% { transform: none; } }
+      .contact-copy-label { transition: none; }
+    }
+
+    /* ─── PAGE TRANSITION ───────────────────────────────── */
+    #pgtrans {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 44%, #1d1929 0%, #12101a 62%);
+      opacity: var(--pgtrans-init, 0);
+    }
+  </style>
+
+  <script>if(sessionStorage.getItem('pg_dir')){document.documentElement.style.setProperty('--pgtrans-init','1')}</script>
+</head>
+<body>
+
+  <div id="pgtrans" aria-hidden="true"></div>
+  <div class="cursor-aura" aria-hidden="true"></div>
+
+  <!-- Custom cursor ring -->
+  <div id="cursor">
+    <div id="cursor-inner">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <mask id="cursor-mask" fill="white">
+          <path d="M0 14.9632C0 6.69925 6.69925 0 14.9632 0C23.2271 0 29.9264 6.69925 29.9264 14.9632C29.9264 23.2271 23.2271 29.9264 14.9632 29.9264C6.69925 29.9264 0 23.2271 0 14.9632Z"/>
+        </mask>
+        <path d="M0 14.9632C0 6.69925 6.69925 0 14.9632 0C23.2271 0 29.9264 6.69925 29.9264 14.9632C29.9264 23.2271 23.2271 29.9264 14.9632 29.9264C6.69925 29.9264 0 23.2271 0 14.9632Z" fill="white" fill-opacity="0.01"/>
+        <path d="M14.9632 29.9264V27.7888C7.87982 27.7888 2.1376 22.0466 2.1376 14.9632H-2.1376C-2.1376 24.4077 5.51869 32.064 14.9632 32.064V29.9264ZM29.9264 14.9632H27.7888C27.7888 22.0466 22.0466 27.7888 14.9632 27.7888V32.064C24.4077 32.064 32.064 24.4077 32.064 14.9632H29.9264ZM14.9632 0V2.1376C22.0466 2.1376 27.7888 7.87982 27.7888 14.9632H32.064C32.064 5.51869 24.4077 -2.1376 14.9632 -2.1376V0ZM14.9632 0V-2.1376C5.51869 -2.1376 -2.1376 5.51869 -2.1376 14.9632H2.1376C2.1376 7.87982 7.87982 2.1376 14.9632 2.1376V0Z" fill="white" mask="url(#cursor-mask)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <header id="g-nav" role="banner">
+    <div id="g-nav-left">
+      <a id="g-nav-back" href="../" aria-label="Back to home" data-aura>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M11 4L6 9L11 14" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <span id="g-nav-breadcrumb">Home / Projects</span>
+    </div>
+    <a id="g-nav-logo" href="../" aria-label="CASAGRANDE — back to homepage" data-aura>
+      <img class="g-nav-icon" src="../icons/simone.svg"      alt="" aria-hidden="true">
+      <img class="g-nav-icon" src="../icons/metapatient.svg" alt="" aria-hidden="true">
+      <div id="g-nav-wordmark"><span id="g-nav-wordmark-text">CASAGRANDE</span></div>
+      <img class="g-nav-icon" src="../icons/nexus.svg"       alt="" aria-hidden="true">
+      <img class="g-nav-icon" src="../icons/booth.svg"       alt="" aria-hidden="true">
+    </a>
+  </header>
+
+  <!-- Project list -->
+  <main id="p-main" aria-label="Selected projects">
+    <div role="list">
+
+      <!-- PLAIAR — active, navigates to case study -->
+      <a class="p-row p-row--active" href="/projects/plaiar"
+         role="listitem" aria-label="PLAIAR — view case study"
+         data-aura-color="255, 162, 80">
+        <div class="p-row-inner">
+          <img class="p-hover-icon" src="../icons/plaiar.svg" alt="" aria-hidden="true">
+          <span class="p-name">PLAIAR</span>
+          <img class="p-hover-icon" src="../icons/plaiar.svg" alt="" aria-hidden="true">
+        </div>
+      </a>
+
+      <!-- METAPATIENT — coming soon, not yet published -->
+      <div class="p-row p-row--soon" role="listitem" aria-label="MetaPatient — coming soon">
+        <div class="p-row-inner">
+          <div class="p-soon-pill p-soon-pill--ghost" aria-hidden="true"><span>Soon</span></div>
+          <span class="p-name">METAPATIENT</span>
+          <div class="p-soon-pill" aria-hidden="true"><span>Soon</span></div>
+        </div>
+      </div>
+
+      <!-- NEXUS SMART — active, navigates to case study -->
+      <a class="p-row p-row--active" href="/projects/nexus-smart"
+         role="listitem" aria-label="Nexus Smart — view case study"
+         data-aura-color="255, 80, 173">
+        <div class="p-row-inner">
+          <img class="p-hover-icon" src="../icons/nexus.svg" alt="" aria-hidden="true">
+          <span class="p-name">NEXUS SMART</span>
+          <img class="p-hover-icon" src="../icons/nexus.svg" alt="" aria-hidden="true">
+        </div>
+      </a>
+
+      <!-- SEE MORE — reveals password gate -->
+      <button class="p-row p-row--seemore" id="p-seemore-row"
+              aria-expanded="false" aria-controls="p-pw-row"
+              aria-label="See more — enter password to reveal protected projects">
+        <div class="p-row-inner">
+          <span class="p-name">SEE MORE</span>
+        </div>
+      </button>
+
+      <!-- PASSWORD ROW -->
+      <div class="p-row p-row--pw" id="p-pw-row" role="listitem" hidden>
+        <div class="p-pw-inner">
+          <input class="p-pw-input" type="text" id="p-pw-input"
+                 placeholder=" " autocomplete="off"
+                 autocorrect="off" autocapitalize="off" spellcheck="false"
+                 aria-label="Enter password to unlock protected projects">
+          <span class="p-pw-label" aria-hidden="true">PASSWORD</span>
+        </div>
+      </div>
+
+      <!-- THE POWER OF V — revealed on correct password -->
+      <a class="p-row p-row--active" id="p-locked-1"
+         href="/projects/the-power-of-v"
+         role="listitem" tabindex="0" hidden
+         aria-label="The Power of V — view project"
+         data-aura-color="255, 223, 80">
+        <div class="p-row-inner">
+          <img class="p-hover-icon" src="../icons/tpov.svg" alt="" aria-hidden="true">
+          <span class="p-name">THE POWER OF V</span>
+          <img class="p-hover-icon" src="../icons/tpov.svg" alt="" aria-hidden="true">
+        </div>
+      </a>
+
+      <!-- 1MM FORUM — revealed on correct password -->
+      <a class="p-row p-row--active" id="p-locked-2"
+         href="/projects/1mm"
+         role="listitem" tabindex="0" hidden
+         aria-label="1MM Forum — view project"
+         data-aura-color="255, 223, 80">
+        <div class="p-row-inner">
+          <img class="p-hover-icon" src="../icons/1mm.svg" alt="" aria-hidden="true">
+          <span class="p-name">1MM FORUM</span>
+          <img class="p-hover-icon" src="../icons/1mm.svg" alt="" aria-hidden="true">
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Fixed footer -->
+  <footer id="p-footer" aria-label="Site info">
+    <p id="p-footer-text">Built with teams at Pfizer, AstraZeneca, AbbVie,<br>
+    Astellas, Amgen, Merck, TransMilenio and many more...</p>
+    <div id="p-footer-btns">
+      <button class="p-btn" data-about data-aura>About me</button>
+      <button class="p-btn contact-btn" id="p-contact-btn"
+              aria-label="Copy email address" data-aura>
+        <span class="contact-label">Contact</span>
+        <span class="contact-copy-label" aria-hidden="true">COPY EMAIL</span>
+      </button>
+      <a class="p-btn p-btn--current" href="./" aria-current="page"
+         aria-label="Projects (current page)" tabindex="-1">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3M8.5 1.5V7"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Projects
+      </a>
+    </div>
+  </footer>
+
+  <div id="p-announce" role="status" aria-live="polite"
+       style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;padding:0;margin:-1px"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="../cursor.js"></script>
+  <script src="../nav.js"></script>
+  <script src="../transition.js"></script>
+  <script src="../about.js"></script>
+
+  <script>
+    'use strict';
+
+    /* ── Cursor aura ───────────────────────────────────── */
+    (function () {
+      var aura = document.querySelector('.cursor-aura');
+      if (!aura) return;
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      var DEFAULT = 'rgba(55,22,68,0.30)';
+      gsap.set(aura, { xPercent: -50, yPercent: -50,
+                       x: window.innerWidth/2, y: window.innerHeight/2 });
+      var mx = gsap.quickTo(aura, 'x', { duration: 0.4, ease: 'none' });
+      var my = gsap.quickTo(aura, 'y', { duration: 0.4, ease: 'none' });
+
+      window.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch') return;
+        mx(e.clientX); my(e.clientY);
+      }, { passive: true });
+
+      document.querySelectorAll('.p-row--active[data-aura-color]').forEach(function (row) {
+        var rgb = row.dataset.auraColor;
+        row.addEventListener('pointerenter', function (e) {
+          if (e.pointerType === 'touch') return;
+          aura.style.setProperty('--aura-color', 'rgba(' + rgb + ',0.38)');
+        });
+        row.addEventListener('pointerleave', function (e) {
+          if (e.pointerType === 'touch') return;
+          aura.style.setProperty('--aura-color', DEFAULT);
+        });
+      });
+    })();
+
+    /* ── Contact: copy email ───────────────────────────── */
+    (function () {
+      var isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      var btn       = document.getElementById('p-contact-btn');
+      var lbl       = btn.querySelector('.contact-label');
+      var copyLbl   = btn.querySelector('.contact-copy-label');
+      var announce  = document.getElementById('p-announce');
+      var EMAIL     = 'fabricasagrande.uy@gmail.com';
+      var copied = false, hovered = false;
+      var resetT, leaveT;
+
+      function sync() { btn.classList.toggle('is-expanded', hovered || copied); }
+
+      async function doCopy() {
+        copied = true;
+        if (isDesktop) { sync(); copyLbl.textContent = 'COPIED!'; }
+        else           { lbl.textContent = 'Email copied!'; }
+        announce.textContent = 'Email address copied to clipboard.';
+        btn.setAttribute('aria-label', 'Email copied!');
+        try { await navigator.clipboard.writeText(EMAIL); } catch (_) {
+          try {
+            var ta = document.createElement('textarea');
+            ta.value = EMAIL; ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+            document.body.appendChild(ta); ta.focus(); ta.select();
+            document.execCommand('copy'); ta.remove();
+          } catch (_) {}
+        }
+        clearTimeout(resetT);
+        resetT = setTimeout(function () {
+          copied = false; copyLbl.textContent = 'COPY EMAIL';
+          lbl.textContent = 'Contact'; announce.textContent = '';
+          btn.setAttribute('aria-label', 'Copy email address');
+          if (!isDesktop) hovered = false;
+          sync();
+        }, 1800);
+      }
+
+      if (isDesktop) {
+        btn.addEventListener('pointerenter', function (e) {
+          if (e.pointerType === 'touch') return;
+          clearTimeout(leaveT); hovered = true; sync();
+        });
+        btn.addEventListener('pointerleave', function (e) {
+          if (e.pointerType === 'touch') return;
+          leaveT = setTimeout(function () { hovered = false; sync(); }, 80);
+        });
+      }
+      btn.addEventListener('click', function () { if (!copied) doCopy(); });
+      btn.addEventListener('focus', function () {
+        clearTimeout(leaveT); hovered = true; sync();
+      });
+      btn.addEventListener('blur', function () {
+        if (!copied) { hovered = false; sync(); }
+      });
+      btn.addEventListener('keydown', function (e) {
+        if ((e.key === 'Enter' || e.key === ' ') && !copied) { e.preventDefault(); doCopy(); }
+      });
+    })();
+
+    /* ── Password gate ─────────────────────────────────── */
+    (function () {
+      var seemoreRow = document.getElementById('p-seemore-row');
+      var pwRow      = document.getElementById('p-pw-row');
+      var pwInput    = document.getElementById('p-pw-input');
+      var locked1    = document.getElementById('p-locked-1');
+      var locked2    = document.getElementById('p-locked-2');
+      var realValue  = '';
+      var busy       = false;
+
+      function showPwRow() {
+        realValue = '';
+        pwInput.value = '';
+        seemoreRow.setAttribute('hidden', '');
+        seemoreRow.setAttribute('aria-expanded', 'true');
+        pwRow.removeAttribute('hidden');
+        requestAnimationFrame(function () { pwInput.focus(); });
+      }
+
+      function unlock(animate) {
+        pwRow.setAttribute('hidden', '');
+        seemoreRow.setAttribute('hidden', '');
+        locked1.removeAttribute('hidden');
+        locked2.removeAttribute('hidden');
+        document.getElementById('p-announce').textContent = 'Projects unlocked.';
+        if (animate && typeof gsap !== 'undefined') {
+          gsap.from([locked1, locked2], {
+            opacity: 0, y: 14, duration: 0.55, stagger: 0.07,
+            ease: 'power3.out', clearProps: 'all'
+          });
+        }
+      }
+
+      function showError() {
+        pwRow.classList.add('is-error');
+        setTimeout(function () {
+          pwRow.classList.remove('is-error');
+          realValue = '';
+          pwInput.value = '';
+          pwInput.disabled = false;
+          busy = false;
+          pwInput.focus();
+        }, 500);
+      }
+
+      /* Auto-reveal if session cookie already authenticated */
+      fetch('/auth/check', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { if (d.authenticated) unlock(false); })
+        .catch(function () {});
+
+      seemoreRow.addEventListener('click', showPwRow);
+      seemoreRow.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showPwRow(); }
+      });
+
+      pwRow.addEventListener('click', function () { pwInput.focus(); });
+
+      /* Asterisk masking — input is type="text" but displays * per char */
+      pwInput.addEventListener('beforeinput', function (e) {
+        e.preventDefault();
+        var t = e.inputType;
+        if (t === 'insertText' && e.data) {
+          realValue += e.data;
+        } else if (t === 'insertFromPaste') {
+          var pasted = e.data || (e.dataTransfer && e.dataTransfer.getData('text/plain')) || '';
+          realValue += pasted;
+        } else if (t === 'deleteContentBackward') {
+          realValue = realValue.slice(0, -1);
+        } else if (t === 'deleteContentForward') {
+          realValue = realValue.slice(1);
+        } else if (t === 'deleteWordBackward') {
+          var tr = realValue.trimEnd();
+          var ls = tr.lastIndexOf(' ');
+          realValue = ls >= 0 ? realValue.slice(0, ls + 1) : '';
+        } else if (t === 'deleteWordForward') {
+          var fs = realValue.indexOf(' ');
+          realValue = fs >= 0 ? realValue.slice(fs + 1) : '';
+        } else if (/^delete/.test(t)) {
+          realValue = '';
+        }
+        pwInput.value = '*'.repeat(realValue.length);
+        pwInput.setSelectionRange(pwInput.value.length, pwInput.value.length);
+      });
+
+      pwInput.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' || busy || !realValue.trim()) return;
+        busy = true;
+        pwInput.disabled = true;
+        fetch('/auth/login', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: realValue })
+        })
+        .then(function (r) {
+          return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+        })
+        .then(function (res) {
+          if (res.ok) { unlock(true); }
+          else        { showError(); }
+        })
+        .catch(function () { showError(); });
+      });
+    })();
+  </script>
+</body>
+</html>

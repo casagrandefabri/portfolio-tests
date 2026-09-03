@@ -137,6 +137,35 @@
       margin-top: 12px;
       color: rgba(255,255,255,0.3);   /* line 2: 30% white */
     }
+    .copy-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 24px;
+      pointer-events: auto;
+    }
+    .copy-btn {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.065px;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      background: rgba(209,209,240,0.15);
+      border-radius: 12px;
+      padding: 0 20px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.2s;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: rgba(209,209,240,0.26); }
+    .copy-btn:focus { outline: none; }
+    .copy-btn:focus-visible { box-shadow: 0 0 0 1px rgba(255,255,255,0.55); }
 
     /* ─── LINKEDIN ───────────────────────────────────────────────────── */
     #linkedin {
@@ -366,7 +395,15 @@
   <!-- Bottom copy -->
   <div id="copy">
     <p>Designing products, services and experiences for&nbsp;humans.</p>
-    <p>Coming soon. Meanwhile, play around with some&nbsp;colors&nbsp;:)</p>
+    <p>Click and drag to release the&nbsp;colors.</p>
+    <div class="copy-btns">
+      <a class="copy-btn" href="https://www.linkedin.com/in/fabricasagrande/" target="_blank" rel="noopener noreferrer">About me</a>
+      <a class="copy-btn" href="mailto:fabricasagrande.uy@gmail.com">Contact</a>
+      <a class="copy-btn" href="projects/">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 8.5L8.5 1.5M8.5 1.5H3M8.5 1.5V7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Projects
+      </a>
+    </div>
   </div>
 
   <!-- LinkedIn -->
@@ -574,6 +611,11 @@
         el.addEventListener(ev, (e) => e.stopPropagation())
       );
     });
+    document.querySelectorAll('.copy-btn').forEach((el) => {
+      ['pointerdown', 'pointermove', 'pointerup'].forEach((ev) =>
+        el.addEventListener(ev, (e) => e.stopPropagation())
+      );
+    });
 
     /* ── Shuffle: re-roll a stable, attractive ink mood ───────────────── */
     const PALETTES = ['violet', 'mixed', 'mixed', 'amber'];
@@ -666,6 +708,11 @@
         try {
           ctx = new (window.AudioContext || window.webkitAudioContext)();
         } catch (_) { enabled = false; return; }
+
+        // Resume immediately — must happen synchronously while still inside
+        // the user gesture, before any CPU-heavy work (IR build, node creation).
+        // iOS Safari invalidates the gesture context after ~100ms of sync work.
+        ctx.resume().catch(() => {});
 
         reverb = ctx.createConvolver();
         reverb.buffer = _makeIR();
@@ -797,6 +844,13 @@
       function setEnabled(on) {
         enabled = on;
         sessionStorage.setItem('soundEnabled', on ? 'true' : 'false');
+        if (on) {
+          // Boot and resume inside this click gesture — handles the case where
+          // the user previously muted and the AudioContext was never created,
+          // or was auto-suspended by the browser during silence.
+          _boot();
+          if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+        }
         if (masterOut && ctx)
           masterOut.gain.setTargetAtTime(on ? 0.82 : 0, ctx.currentTime, 0.14);
         if (!on) voices.forEach((_, id) => stop(id));
@@ -804,8 +858,36 @@
 
       function isEnabled() { return enabled; }
 
-      return { start, update, stop, setEnabled, isEnabled };
+      // Lightweight unlock: boot the context and resume it inside a gesture.
+      // Does not create voices — used by the mobile first-touch handler.
+      function unlock() {
+        _boot();
+        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      }
+
+      return { start, update, stop, setEnabled, isEnabled, unlock };
     })();
+
+    /* ── Mobile: auto-unlock audio on first touch ────────────────────────
+       On touch devices, AudioContext cannot be created or resumed without a
+       user gesture. We use a one-time capture-phase listener so that the very
+       first touch anywhere on the page (canvas or UI) unlocks the context
+       synchronously, before the existing pointerdown voice-start handler runs.
+       Desktop keeps its existing flow — pointerdown → start() — unchanged.  ── */
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      let _audioUnlocked = false;
+      const _onFirstTouch = () => {
+        if (_audioUnlocked) return;
+        _audioUnlocked = true;
+        document.removeEventListener('touchstart',  _onFirstTouch, true);
+        document.removeEventListener('pointerdown', _onFirstTouch, true);
+        if (SoundEngine.isEnabled()) SoundEngine.unlock();
+      };
+      // touchstart fires before pointerdown on iOS — both registered so either
+      // alone is sufficient; the guard prevents double-execution.
+      document.addEventListener('touchstart',  _onFirstTouch, { passive: true, capture: true });
+      document.addEventListener('pointerdown', _onFirstTouch, { passive: true, capture: true });
+    }
 
     /* ── Wire sound to canvas pointer interactions ─────────────────────── */
     {

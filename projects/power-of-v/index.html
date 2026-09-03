@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <base href="/projects/power-of-v/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>The Power of V — CASAGRANDE</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../cursor.css">
+  <link rel="stylesheet" href="../../nav.css">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    img, svg { display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    :root {
+      --mono: 'Red Hat Mono', ui-monospace, monospace;
+      --monument: 'PP Monument Extended', sans-serif;
+    }
+
+    html, body {
+      min-height: 100%;
+      background:
+        radial-gradient(72% 85% at 82% 42%, rgba(10,7,24,0.98) 0%, rgba(12,8,27,0.96) 34%, rgba(16,10,27,0.8) 54%, transparent 76%),
+        radial-gradient(95% 120% at -8% 48%, rgba(57,23,43,0.38) 0%, rgba(38,17,34,0.22) 42%, transparent 74%),
+        radial-gradient(72% 72% at 56% 110%, rgba(47,18,36,0.34) 0%, transparent 72%),
+        linear-gradient(115deg, #19131d 0%, #160f1a 42%, #12101e 100%);
+      color: #e4e4e4;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.045; mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.9'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
+    }
+
+    main {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100svh;
+      padding: var(--nav-h) 40px 120px;
+      text-align: center; gap: 24px;
+    }
+
+    .cs-title {
+      font-family: var(--monument);
+      font-size: clamp(32px, 6vw, 80px);
+      font-weight: 900; text-transform: uppercase;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.55);
+      line-height: 1; letter-spacing: -0.01em;
+    }
+
+    .cs-sub {
+      font-family: var(--mono);
+      font-size: 13px; letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.32);
+    }
+
+    #pgtrans {
+      position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 44%, #1d1929 0%, #12101a 62%);
+      opacity: var(--pgtrans-init, 0);
+    }
+  </style>
+
+  <script>if(sessionStorage.getItem('pg_dir')){document.documentElement.style.setProperty('--pgtrans-init','1')}</script>
+</head>
+<body>
+  <div id="pgtrans" aria-hidden="true"></div>
+
+  <div id="cursor"><div id="cursor-inner">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+      <mask id="cursor-mask" fill="white">
+        <path d="M0 14.9632C0 6.69925 6.69925 0 14.9632 0C23.2271 0 29.9264 6.69925 29.9264 14.9632C29.9264 23.2271 23.2271 29.9264 14.9632 29.9264C6.69925 29.9264 0 23.2271 0 14.9632Z"/>
+      </mask>
+      <path d="M0 14.9632C0 6.69925 6.69925 0 14.9632 0C23.2271 0 29.9264 6.69925 29.9264 14.9632C29.9264 23.2271 23.2271 29.9264 14.9632 29.9264C6.69925 29.9264 0 23.2271 0 14.9632Z" fill="white" fill-opacity="0.01"/>
+      <path d="M14.9632 29.9264V27.7888C7.87982 27.7888 2.1376 22.0466 2.1376 14.9632H-2.1376C-2.1376 24.4077 5.51869 32.064 14.9632 32.064V29.9264ZM29.9264 14.9632H27.7888C27.7888 22.0466 22.0466 27.7888 14.9632 27.7888V32.064C24.4077 32.064 32.064 24.4077 32.064 14.9632H29.9264ZM14.9632 0V2.1376C22.0466 2.1376 27.7888 7.87982 27.7888 14.9632H32.064C32.064 5.51869 24.4077 -2.1376 14.9632 -2.1376V0ZM14.9632 0V-2.1376C5.51869 -2.1376 -2.1376 5.51869 -2.1376 14.9632H2.1376C2.1376 7.87982 7.87982 2.1376 14.9632 2.1376V0Z" fill="white" mask="url(#cursor-mask)"/>
+    </svg>
+  </div></div>
+
+  <header id="g-nav" role="banner">
+    <div id="g-nav-left">
+      <a id="g-nav-back" href="/projects/" aria-label="Back to projects" data-aura>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M11 4L6 9L11 14" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <span id="g-nav-breadcrumb">Projects</span>
+    </div>
+    <a id="g-nav-logo" href="../../" aria-label="CASAGRANDE — back to homepage" data-aura>
+      <img class="g-nav-icon" src="../../icons/simone.svg"      alt="" aria-hidden="true">
+      <img class="g-nav-icon" src="../../icons/metapatient.svg" alt="" aria-hidden="true">
+      <div id="g-nav-wordmark"><span id="g-nav-wordmark-text">CASAGRANDE</span></div>
+      <img class="g-nav-icon" src="../../icons/nexus.svg"       alt="" aria-hidden="true">
+      <img class="g-nav-icon" src="../../icons/booth.svg"       alt="" aria-hidden="true">
+    </a>
+  </header>
+
+  <main>
+    <h1 class="cs-title">The Power of V</h1>
+    <p class="cs-sub">Case study coming soon</p>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="../../cursor.js"></script>
+  <script src="../../nav.js"></script>
+  <script src="../../transition.js"></script>
+</body>
+</html>

@@ -4,7 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>CASAGRANDE</title>
-  <meta name="description" content="Designing products, services and experiences for humans.">
+  <meta name="description" content="Designing experiences, products and services. Working between people and technology.">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://casagrande.design/">
+  <meta property="og:title"       content="CASAGRANDE">
+  <meta property="og:description" content="Designing experiences, products and services. Working between people and technology.">
+  <meta property="og:image"       content="https://casagrande.design/og-preview.png?v=2">
+  <meta property="og:image:type"  content="image/png">
+  <meta property="og:image:width" content="1916">
+  <meta property="og:image:height" content="1316">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="CASAGRANDE">
+  <meta name="twitter:description" content="Designing experiences, products and services. Working between people and technology.">
+  <meta name="twitter:image"       content="https://casagrande.design/og-preview.png?v=2">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -120,6 +137,56 @@
       margin-top: 12px;
       color: rgba(255,255,255,0.3);   /* line 2: 30% white */
     }
+    .copy-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 24px;
+      pointer-events: auto;
+    }
+    .copy-btn {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.065px;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      background: linear-gradient(80deg, rgba(209,209,255,0.1) 0%, rgba(255,192,226,0.1) 100%);
+      border-radius: 12px;
+      padding: 12px 18px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+      cursor: none;
+      border: none;
+      white-space: nowrap;
+      position: relative;
+      isolation: isolate;
+      touch-action: auto;
+    }
+    .copy-btn:hover {
+      background: linear-gradient(80deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 100%);
+    }
+    .copy-btn:focus { outline: none; }
+    .copy-btn:focus-visible { box-shadow: 0 0 0 1px rgba(255,255,255,0.55); }
+
+    /* Contact button — two flex siblings, matches Figma node 2639:923 exactly.
+       gap is zeroed here; the 10px spacing lives as padding-left inside
+       .contact-copy-label so it gets clipped when max-width is 0. */
+    .contact-btn { gap: 0; }
+    .contact-copy-label {
+      color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 0;
+      padding-left: 0;
+      transition: max-width 0.28s cubic-bezier(0.22,1,0.36,1),
+                  padding-left 0.28s cubic-bezier(0.22,1,0.36,1);
+    }
+    .contact-btn.is-expanded .contact-copy-label { max-width: 130px; padding-left: 10px; }
+    @media (prefers-reduced-motion: reduce) { .contact-copy-label { transition: none; } }
 
     /* ─── LINKEDIN ───────────────────────────────────────────────────── */
     #linkedin {
@@ -193,7 +260,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      cursor: none;
       flex-shrink: 0;
       transition: background 0.2s, box-shadow 0.3s;
       touch-action: auto;
@@ -225,9 +292,18 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      cursor: pointer;
+      cursor: none;
+      overflow: hidden;
       transition: background 0.2s, box-shadow 0.3s;
       touch-action: auto;
+    }
+    .shuffle-sweep {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
     }
     #shuffle-btn:hover {
       background: linear-gradient(76.47deg, rgba(209,209,255,0.18) 0%, rgba(255,192,226,0.18) 99.834%);
@@ -260,6 +336,7 @@
     #shuffle-btn { --aura-size: 95px; --aura-strength: 0.16; }
     #ink-trigger { --aura-size: 70px; --aura-strength: 0.18; }
     #sound-btn   { --aura-size: 85px; --aura-strength: 0.18; }
+    .copy-btn    { --aura-size: 85px; --aura-strength: 0.16; }
 
     /* Full-viewport pointer tracker — transparent event surface that sits above
        the ink canvas (z:0) but below all UI (z:10+). pointer-events enabled so
@@ -302,19 +379,53 @@
 
     /* ─── RESPONSIVE ─────────────────────────────────────────────────── */
     @media (max-width: 600px) {
-      #copy { white-space: normal; width: 86vw; bottom: 80px; }
+      /* LinkedIn: bottom-left → top-left */
+      #linkedin { bottom: auto; top: 24px; left: 24px; }
+
+      /* Sound + Shuffle: bottom-right → top-right */
+      #bottom-right { bottom: auto; top: 24px; right: 24px; }
+
+      /* Shuffle collapses to icon-only to fit the top bar */
+      #shuffle-btn { width: 42px; padding: 0; justify-content: center; gap: 0; font-size: 0; }
+
+      /* ISO-S icons: stay top-center, scaled to clear the corner buttons */
+      #ink-trigger-wrap { top: 24px; }
+      .ink-trigger-icons { width: 90px; }
+
+      /* Copy: nothing at bottom any more — anchor to safe bottom edge */
+      #copy {
+        white-space: normal;
+        width: calc(100% - 48px);
+        left: 24px;
+        transform: none;
+        bottom: max(24px, env(safe-area-inset-bottom));
+      }
       #copy p { font-size: 12px; line-height: 1.4; }
       #copy p + p { margin-top: 8px; }
-      #linkedin { bottom: 24px; left: 24px; }
-      #bottom-right { bottom: 24px; right: 24px; }
-      #ink-trigger-wrap { top: 24px; }
+
+      /* Contact: hide the reveal label entirely on mobile */
+      .contact-copy-label { display: none; }
     }
     @media (max-width: 380px) {
       #logo-wrap svg { width: 94vw; }
+      .copy-btns { flex-wrap: wrap; }
+    }
+
+    /* ─── PAGE TRANSITION OVERLAY ──────────────────────── */
+    #pgtrans {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(ellipse at 50% 44%, #1d1929 0%, #12101a 62%);
+      pointer-events: none;
+      opacity: var(--pgtrans-init, 0);
     }
   </style>
+  <script>if(sessionStorage.getItem('pg_dir')){document.documentElement.style.setProperty('--pgtrans-init','1')}</script>
 </head>
 <body>
+
+  <div id="pgtrans" aria-hidden="true"></div>
 
   <!-- Custom cursor: outer shell positions, inner GSAP-scales on press -->
   <div id="cursor">
@@ -339,8 +450,16 @@
 
   <!-- Bottom copy -->
   <div id="copy">
-    <p>Designing products, services and experiences for humans.</p>
-    <p>Page coming soon. For now, play around with some colors :)</p>
+    <p>Designing products, services and experiences for&nbsp;humans.</p>
+    <p>Click and drag to release the&nbsp;colors.</p>
+    <div class="copy-btns">
+      <button class="copy-btn" data-about data-aura>About me</button>
+      <button class="copy-btn contact-btn" id="contact-btn" data-aura aria-label="Copy email address"><span class="contact-label">Contact</span><span class="contact-copy-label" aria-hidden="true">COPY EMAIL</span></button>
+      <a class="copy-btn" data-aura href="projects/">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1.5 8.5L8.5 1.5M8.5 1.5H3M8.5 1.5V7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Projects
+      </a>
+    </div>
   </div>
 
   <!-- LinkedIn -->
@@ -372,6 +491,7 @@
       </svg>
     </button>
     <button id="shuffle-btn" data-aura aria-label="Swap colors">
+      <span class="shuffle-sweep" aria-hidden="true"></span>
       Swap colors
       <img src="swap-colors-icon.svg" alt="" class="swap-icon" draggable="false">
     </button>
@@ -382,6 +502,9 @@
 
   <!-- Global canvas interaction affordance -->
   <div id="canvas-aura"><div id="canvas-aura-inner"></div></div>
+
+  <!-- Accessibility: announces clipboard copy result to screen readers -->
+  <div id="email-announce" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;padding:0;margin:-1px;"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
@@ -438,22 +561,23 @@
 
     if (isDesktop) {
       const hintEl = document.getElementById('cursor-hint');
-      let hintDismissed    = false;
-      let trackerPtrDown   = false;   // pointer is currently pressed on the canvas
+      let hintDismissed  = false;
+      let trackerPtrDown = false;   // pointer is currently pressed on the canvas
+      let overButton     = false;   // cursor is over a UI button (not the ink canvas)
 
       // Custom cursor: position on every mousemove.
       document.addEventListener('mousemove', (e) => {
         cursorEl.style.transform = `translate(${e.clientX - 15}px,${e.clientY - 15}px)`;
       });
-      // Ring: compress on press (no bounce on release — power2.out for clean return).
-      // Brightness uses a CSS transition (filter) separate from GSAP's transform.
+      // Ring scale is context-aware: buttons get a tighter press range (0.9→0.8)
+      // than the canvas (1→0.86), so the ring never implies an ink interaction.
       document.addEventListener('mousedown', () => {
         cursorInner.style.filter = 'brightness(1.5)';
-        gsap.to(cursorInner, { scale: 0.86, duration: 0.10, ease: 'power2.out', overwrite: true });
+        gsap.to(cursorInner, { scale: overButton ? 0.8 : 0.86, duration: 0.10, ease: 'power2.out', overwrite: true });
       });
       document.addEventListener('mouseup', () => {
         cursorInner.style.filter = '';
-        gsap.to(cursorInner, { scale: 1,    duration: 0.20, ease: 'power2.out', overwrite: true });
+        gsap.to(cursorInner, { scale: overButton ? 0.9 : 1, duration: 0.20, ease: 'power2.out', overwrite: true });
       });
 
       // Canvas aura — driven by #canvas-tracker (position: fixed; inset: 0; z-index: 1).
@@ -512,6 +636,34 @@
         });
       };
       document.querySelectorAll('[data-aura]').forEach(registerAura);
+
+      // Button cursor + hint management.
+      // Collected explicitly — excludes #ink-trigger which is the canvas zone.
+      const uiButtons = [
+        document.getElementById('linkedin'),
+        document.getElementById('sound-btn'),
+        document.getElementById('shuffle-btn'),
+        ...document.querySelectorAll('.copy-btn'),
+      ];
+
+      uiButtons.forEach((el) => {
+        el.addEventListener('pointerenter', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          overButton = true;
+          // Shrink ring to 90% — removes the "ink drag" affordance over buttons.
+          gsap.to(cursorInner, { scale: 0.9, duration: 0.12, ease: 'power2.out', overwrite: true });
+          // Hide the "CLICK + DRAG" hint while over a button.
+          if (!hintDismissed) gsap.to(hintEl, { opacity: 0, duration: 0.1, overwrite: 'auto' });
+        });
+        el.addEventListener('pointerleave', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          overButton = false;
+          // Restore ring to 100%.
+          gsap.to(cursorInner, { scale: 1, duration: 0.15, ease: 'power2.out', overwrite: true });
+          // Restore hint when returning to canvas (if not permanently dismissed).
+          if (!hintDismissed) gsap.to(hintEl, { opacity: 1, duration: 0.15, overwrite: 'auto' });
+        });
+      });
     }
 
     /* ── Touch canvas aura ─────────────────────────────────────────────
@@ -547,154 +699,283 @@
         el.addEventListener(ev, (e) => e.stopPropagation())
       );
     });
+    document.querySelectorAll('.copy-btn').forEach((el) => {
+      ['pointerdown', 'pointermove', 'pointerup'].forEach((ev) =>
+        el.addEventListener(ev, (e) => e.stopPropagation())
+      );
+    });
 
     /* ── Shuffle: re-roll a stable, attractive ink mood ───────────────── */
     const PALETTES = ['violet', 'mixed', 'mixed', 'amber'];
     const rnd = (lo, hi) => +(Math.random() * (hi - lo) + lo).toFixed(2);
 
+    // RGB palette data mirrored from interactive-ink.js PALETTES constant
+    const PALETTE_COLORS = {
+      violet: [[0.45, 0.18, 0.62], [0.30, 0.23, 0.78], [0.20, 0.32, 0.74], [0.62, 0.16, 0.52]],
+      amber:  [[0.95, 0.55, 0.16], [0.82, 0.40, 0.12], [0.62, 0.26, 0.12], [0.92, 0.72, 0.28]],
+      mixed:  [[0.45, 0.18, 0.62], [0.29, 0.24, 0.80], [0.62, 0.16, 0.52], [0.94, 0.60, 0.20]],
+    };
+
     const shuffleBtn = document.getElementById('shuffle-btn');
+    const sweepEl    = shuffleBtn.querySelector('.shuffle-sweep');
+
+    function _showPaletteSweep(paletteName) {
+      const colors = PALETTE_COLORS[paletteName] || PALETTE_COLORS.mixed;
+      const stops  = colors.map(([r, g, b]) =>
+        `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.55)`
+      ).join(', ');
+      sweepEl.style.background = `linear-gradient(90deg, ${stops})`;
+      sweepEl.style.clipPath   = 'inset(0 100% 0 0 round 12px)';
+      sweepEl.style.opacity    = '1';
+      gsap.killTweensOf(sweepEl);
+      gsap.to(sweepEl, {
+        clipPath: 'inset(0 0% 0 0 round 12px)',
+        duration: 0.32,
+        ease: 'power2.out',
+        overwrite: true,
+        onComplete() {
+          gsap.to(sweepEl, {
+            opacity: 0,
+            duration: 0.34,
+            ease: 'power2.in',
+            onComplete() { sweepEl.style.clipPath = ''; }
+          });
+        }
+      });
+    }
+
     shuffleBtn.addEventListener('click', () => {
+      const paletteName = PALETTES[Math.floor(Math.random() * PALETTES.length)];
       ink.set({
-        palette:     PALETTES[Math.floor(Math.random() * PALETTES.length)],
+        palette:     paletteName,
         intensity:   rnd(0.6, 1.6),
         radius:      rnd(0.5, 1.8),
         dissipation: rnd(0.5, 1.8),
         curl:        rnd(0.4, 2.0),
       });
-      // Subtle glow flash — feedback without spinning the icon
-      gsap.fromTo(shuffleBtn,
-        { boxShadow: '0 0 0 1px rgba(255,255,255,0.35), 0 0 18px rgba(255,255,255,0.12)' },
-        { boxShadow: '0 0 0 0px rgba(255,255,255,0)', duration: 0.55, ease: 'power2.out', overwrite: true }
-      );
+      _showPaletteSweep(paletteName);
     });
 
-    /* ── Web Audio: coordinate-driven ambient sound ────────────────────────
-       Created lazily on first user gesture. Plays only on canvas pointer
-       interactions (UI buttons call stopPropagation, so they never trigger
-       window listeners). X → pitch, Y → filter warmth, velocity → swell,
-       X position → stereo pan. Piano-like sine + detuned octave through
-       a lowpass filter gives a soft, tonal + airy character.             ── */
+    /* ── Web Audio: coordinate-driven deep ambient sound ──────────────────
+       Dark, tactile, sci-fi character. Sub-bass triangle oscillator +
+       sub-octave sine through a resonant lowpass, fed into a synthetic
+       convolution reverb that creates a long spatial tail. Lazy-init on
+       first gesture. UI buttons use stopPropagation so only canvas
+       interactions trigger window listeners and therefore sound.
+
+       X → pitch (50–300 Hz, deep bass range)
+       Y → filter warmth (80–600 Hz cutoff, always in low-frequency realm)
+       velocity → filter resonance Q + gain swell (faster = more intense)
+       X → stereo pan (±0.45)                                            ── */
     const SoundEngine = (() => {
-      let ctx = null;
-      let compressor = null;
-      let masterOut = null;
-      const voices = new Map(); // pointerId → { osc1, osc2, o2g, filter, env, panner }
-      let enabled = sessionStorage.getItem('soundEnabled') !== 'false'; // default ON
+      let ctx           = null;
+      let reverb        = null;
+      let reverbWet     = null;
+      let limiter       = null;
+      let masterOut     = null;
+      const voices      = new Map();
+      const cleanupTimers = new Map(); // pending stop timers, keyed by pointerId
+
+      let enabled = sessionStorage.getItem('soundEnabled') !== 'false';
+
+      // Synthesise a reverb impulse response in memory — no network request.
+      function _makeIR() {
+        const rate  = ctx.sampleRate;
+        const len   = Math.ceil(rate * 2.1);
+        const buf   = ctx.createBuffer(2, len, rate);
+        for (let c = 0; c < 2; c++) {
+          const ch = buf.getChannelData(c);
+          for (let i = 0; i < len; i++)
+            ch[i] = (Math.random() * 2 - 1) * Math.exp(-3.8 * i / len);
+        }
+        return buf;
+      }
 
       function _boot() {
         if (ctx) return;
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        try {
+          ctx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (_) { enabled = false; return; }
 
-        compressor = ctx.createDynamicsCompressor();
-        compressor.threshold.value = -16;
-        compressor.knee.value      = 8;
-        compressor.ratio.value     = 4;
-        compressor.attack.value    = 0.003;
-        compressor.release.value   = 0.25;
+        // Resume immediately — must happen synchronously while still inside
+        // the user gesture, before any CPU-heavy work (IR build, node creation).
+        // iOS Safari invalidates the gesture context after ~100ms of sync work.
+        ctx.resume().catch(() => {});
+
+        reverb = ctx.createConvolver();
+        reverb.buffer = _makeIR();
+
+        reverbWet = ctx.createGain();
+        reverbWet.gain.value = 0.42;
+
+        limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.value = -14;
+        limiter.knee.value      = 6;
+        limiter.ratio.value     = 8;
+        limiter.attack.value    = 0.001;
+        limiter.release.value   = 0.3;
 
         masterOut = ctx.createGain();
-        masterOut.gain.value = enabled ? 1 : 0;
+        masterOut.gain.value = enabled ? 0.82 : 0;
 
-        compressor.connect(masterOut);
+        reverb.connect(reverbWet);
+        reverbWet.connect(limiter);
+        limiter.connect(masterOut);
         masterOut.connect(ctx.destination);
       }
 
-      // X: 0 (left) → 200 Hz, 1 (right) → 800 Hz (2 octaves, exponential)
-      function _freq(x) { return 200 * Math.pow(4, Math.max(0, Math.min(1, x))); }
+      function _freq(x)        { return 50 * Math.pow(6, Math.max(0, Math.min(1, x))); }
+      function _cutoff(y, spd) {
+        return Math.min(80 * Math.pow(7.5, 1 - Math.max(0, Math.min(1, y))) + spd * 500, 700);
+      }
+      function _Q(spd) { return 4 + Math.min(spd * 70, 9); }
 
-      // Y: 0 (top of viewport) → 2800 Hz bright, 1 (bottom) → 350 Hz warm
-      function _cutoff(y, speed) {
-        const base = 350 * Math.pow(8, 1 - Math.max(0, Math.min(1, y)));
-        return Math.min(base + speed * 1800, 4000);
+      // Immediately disconnect and remove a voice without waiting for fade.
+      function _destroyVoice(id) {
+        const v = voices.get(id);
+        if (!v) return;
+        try { v.osc1.stop(); v.osc2.stop(); } catch (_) {}
+        [v.osc1, v.osc2, v.o2g, v.filter, v.env, v.panner, v.dryGain].forEach(n => {
+          try { n.disconnect(); } catch (_) {}
+        });
+        voices.delete(id);
       }
 
       function start(id, x, y) {
         if (!enabled) return;
         _boot();
-        if (ctx.state === 'suspended') ctx.resume();
-        if (voices.has(id)) return;
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+        // Cancel any pending cleanup for this id and destroy the stale voice first,
+        // so rapid press-release-press doesn't silently drop the new press.
+        if (cleanupTimers.has(id)) {
+          clearTimeout(cleanupTimers.get(id));
+          cleanupTimers.delete(id);
+          _destroyVoice(id);
+        }
+        if (voices.has(id)) return; // already active (shouldn't happen after above)
 
         const now  = ctx.currentTime;
         const freq = _freq(x);
 
         const osc1 = ctx.createOscillator();
-        osc1.type           = 'sine';
+        osc1.type            = 'triangle';
         osc1.frequency.value = freq;
 
-        // Octave + tiny detune → soft chorus shimmer
         const osc2 = ctx.createOscillator();
-        osc2.type           = 'sine';
-        osc2.frequency.value = freq * 2.006;
+        osc2.type            = 'sine';
+        osc2.frequency.value = freq * 0.501;
 
         const o2g = ctx.createGain();
-        o2g.gain.value = 0.18;
+        o2g.gain.value = 0.55;
 
         const filter = ctx.createBiquadFilter();
-        filter.type             = 'lowpass';
-        filter.frequency.value  = _cutoff(y, 0);
-        filter.Q.value          = 1.0;
+        filter.type            = 'lowpass';
+        filter.frequency.value = _cutoff(y, 0);
+        filter.Q.value         = 5;
 
         const env = ctx.createGain();
         env.gain.setValueAtTime(0, now);
-        env.gain.linearRampToValueAtTime(0.14, now + 0.07); // 70 ms attack
+        env.gain.linearRampToValueAtTime(0.18, now + 0.008); // 8ms attack — immediate feel
 
         const panner = ctx.createStereoPanner();
-        panner.pan.value = (x * 2 - 1) * 0.55;
+        panner.pan.value = (x * 2 - 1) * 0.45;
+
+        const dryGain = ctx.createGain();
+        dryGain.gain.value = 0.62;
 
         osc1.connect(filter);
         osc2.connect(o2g);
         o2g.connect(filter);
         filter.connect(env);
         env.connect(panner);
-        panner.connect(compressor);
+        panner.connect(dryGain);
+        dryGain.connect(limiter);
+        panner.connect(reverb);
 
         osc1.start(now);
         osc2.start(now);
 
-        voices.set(id, { osc1, osc2, o2g, filter, env, panner });
+        voices.set(id, { osc1, osc2, o2g, filter, env, panner, dryGain });
       }
 
-      function update(id, x, y, speed) {
+      function update(id, x, y, spd) {
         const v = voices.get(id);
         if (!v || !ctx) return;
         const now  = ctx.currentTime;
         const freq = _freq(x);
-        v.osc1.frequency.setTargetAtTime(freq,          now, 0.04);
-        v.osc2.frequency.setTargetAtTime(freq * 2.006,  now, 0.04);
-        v.filter.frequency.setTargetAtTime(_cutoff(y, speed), now, 0.06);
-        // Velocity swells the gain — louder + airier when dragging fast
-        v.env.gain.setTargetAtTime(0.06 + Math.min(speed * 2.5, 0.12), now, 0.03);
-        v.panner.pan.setTargetAtTime((x * 2 - 1) * 0.55, now, 0.08);
+        v.osc1.frequency.setTargetAtTime(freq,               now, 0.04);
+        v.osc2.frequency.setTargetAtTime(freq * 0.501,       now, 0.04);
+        v.filter.frequency.setTargetAtTime(_cutoff(y, spd),  now, 0.06);
+        v.filter.Q.setTargetAtTime(_Q(spd),                  now, 0.05);
+        v.env.gain.setTargetAtTime(0.08 + Math.min(spd * 2.2, 0.11), now, 0.04);
+        v.panner.pan.setTargetAtTime((x * 2 - 1) * 0.45,    now, 0.08);
       }
 
       function stop(id) {
         const v = voices.get(id);
         if (!v || !ctx) return;
+        // Cancel any in-flight ramps and ramp gain to zero before cleanup.
         const now = ctx.currentTime;
         v.env.gain.cancelScheduledValues(now);
-        v.env.gain.setTargetAtTime(0, now, 0.07); // ~350 ms to silence
-        setTimeout(() => {
-          try { v.osc1.stop(); v.osc2.stop(); } catch (_) {}
-          [v.osc1, v.osc2, v.o2g, v.filter, v.env, v.panner].forEach(n => {
-            try { n.disconnect(); } catch (_) {}
-          });
-          voices.delete(id);
-        }, 450);
+        v.env.gain.setTargetAtTime(0, now, 0.025); // ~80ms to silence
+        // Schedule cleanup after the gain has decayed far enough to be inaudible.
+        // Reverb tail continues through the shared node after the voice is gone.
+        const timer = setTimeout(() => {
+          _destroyVoice(id);
+          cleanupTimers.delete(id);
+        }, 160);
+        cleanupTimers.set(id, timer);
       }
 
       function setEnabled(on) {
         enabled = on;
         sessionStorage.setItem('soundEnabled', on ? 'true' : 'false');
-        if (masterOut && ctx) {
-          masterOut.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, 0.12);
+        if (on) {
+          // Boot and resume inside this click gesture — handles the case where
+          // the user previously muted and the AudioContext was never created,
+          // or was auto-suspended by the browser during silence.
+          _boot();
+          if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
         }
+        if (masterOut && ctx)
+          masterOut.gain.setTargetAtTime(on ? 0.82 : 0, ctx.currentTime, 0.14);
         if (!on) voices.forEach((_, id) => stop(id));
       }
 
       function isEnabled() { return enabled; }
 
-      return { start, update, stop, setEnabled, isEnabled };
+      // Lightweight unlock: boot the context and resume it inside a gesture.
+      // Does not create voices — used by the mobile first-touch handler.
+      function unlock() {
+        _boot();
+        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      }
+
+      return { start, update, stop, setEnabled, isEnabled, unlock };
     })();
+
+    /* ── Mobile: auto-unlock audio on first touch ────────────────────────
+       On touch devices, AudioContext cannot be created or resumed without a
+       user gesture. We use a one-time capture-phase listener so that the very
+       first touch anywhere on the page (canvas or UI) unlocks the context
+       synchronously, before the existing pointerdown voice-start handler runs.
+       Desktop keeps its existing flow — pointerdown → start() — unchanged.  ── */
+    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      let _audioUnlocked = false;
+      const _onFirstTouch = () => {
+        if (_audioUnlocked) return;
+        _audioUnlocked = true;
+        document.removeEventListener('touchstart',  _onFirstTouch, true);
+        document.removeEventListener('pointerdown', _onFirstTouch, true);
+        if (SoundEngine.isEnabled()) SoundEngine.unlock();
+      };
+      // touchstart fires before pointerdown on iOS — both registered so either
+      // alone is sufficient; the guard prevents double-execution.
+      document.addEventListener('touchstart',  _onFirstTouch, { passive: true, capture: true });
+      document.addEventListener('pointerdown', _onFirstTouch, { passive: true, capture: true });
+    }
 
     /* ── Wire sound to canvas pointer interactions ─────────────────────── */
     {
@@ -721,6 +1002,97 @@
       window.addEventListener('pointercancel', _soundEnd, { passive: true });
     }
 
+    /* ── Contact button: expand-on-hover + clipboard copy ───────────── */
+    {
+      const contactBtn       = document.getElementById('contact-btn');
+      const contactLabel     = contactBtn.querySelector('.contact-label');
+      const contactCopyLabel = contactBtn.querySelector('.contact-copy-label');
+      const emailAnnounce    = document.getElementById('email-announce');
+      const EMAIL = 'fabricasagrande.uy@gmail.com';
+
+      let isCopied   = false;
+      let isHovered  = false;
+      let resetTimer = null;
+      let leaveTimer = null;
+
+      const syncExpanded = () =>
+        contactBtn.classList.toggle('is-expanded', isHovered || isCopied);
+
+      async function doCopy() {
+        isCopied = true;
+        if (isDesktop) {
+          syncExpanded();
+          contactCopyLabel.textContent = 'COPIED!';
+        } else {
+          contactLabel.textContent = 'Email copied!';
+        }
+        emailAnnounce.textContent = 'Email address copied to clipboard.';
+        contactBtn.setAttribute('aria-label', 'Email copied!');
+        try {
+          await navigator.clipboard.writeText(EMAIL);
+        } catch (_) {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = EMAIL;
+            ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            document.execCommand('copy');
+            ta.remove();
+          } catch (_) {}
+        }
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+          isCopied = false;
+          contactCopyLabel.textContent = 'COPY EMAIL';
+          contactLabel.textContent = 'Contact';
+          emailAnnounce.textContent = '';
+          contactBtn.setAttribute('aria-label', 'Copy email address');
+          if (!isDesktop) isHovered = false;
+          syncExpanded();
+        }, 1800);
+      }
+
+      // Desktop: hover expands; click copies
+      if (isDesktop) {
+        contactBtn.addEventListener('pointerenter', (e) => {
+          if (e.pointerType === 'touch') return;
+          clearTimeout(leaveTimer);
+          isHovered = true;
+          syncExpanded();
+        });
+        contactBtn.addEventListener('pointerleave', (e) => {
+          if (e.pointerType === 'touch') return;
+          // 80ms debounce prevents flicker at the expansion boundary
+          leaveTimer = setTimeout(() => {
+            isHovered = false;
+            syncExpanded();
+          }, 80);
+        });
+      }
+
+      // Click: mobile swaps button text; desktop copies after hover-expand
+      contactBtn.addEventListener('click', () => {
+        if (!isCopied) doCopy();
+      });
+
+      // Keyboard: focus expands, blur collapses (if not mid-copy)
+      contactBtn.addEventListener('focus', () => {
+        clearTimeout(leaveTimer);
+        isHovered = true;
+        syncExpanded();
+      });
+      contactBtn.addEventListener('blur', () => {
+        if (!isCopied) { isHovered = false; syncExpanded(); }
+      });
+      contactBtn.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && !isCopied) {
+          e.preventDefault();
+          doCopy();
+        }
+      });
+    }
+
     /* ── Sound-Viz toggle ──────────────────────────────────────────────── */
     {
       const soundBtn = document.getElementById('sound-btn');
@@ -743,7 +1115,10 @@
 
       _syncSoundBtn(); // apply persisted state on load
     }
+
   </script>
+  <script src="transition.js"></script>
+  <script src="about.js"></script>
 
 </body>
 </html>
